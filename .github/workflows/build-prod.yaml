@@ -39,4 +39,4 @@ jobs:
                       yarn
                       yarn prebuild
                       yarn build
-                      yarn start:prod
+                      pm2 start dist/main.js
