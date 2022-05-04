@@ -39,4 +39,4 @@ jobs:
                       yarn
                       yarn prebuild
                       yarn build
-                      pm2 start dist/main.js
+                      pm2 restart api
