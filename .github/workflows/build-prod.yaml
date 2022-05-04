@@ -37,4 +37,6 @@ jobs:
                       git checkout master
                       git pull
                       yarn
+                      yarn prebuild
+                      yarn build
                       yarn start:prod
