@@ -16,7 +16,7 @@ export class CreateTopicSectionDto {
 
     @IsArray()
     @IsOptional()
-    units: [];
+    units?: [];
 }
 
 export class CreateTopicDto {
@@ -25,6 +25,7 @@ export class CreateTopicDto {
     title: string;
 
     @IsArray()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => CreateTopicSectionDto)
     sections?: CreateTopicSectionDto[];
