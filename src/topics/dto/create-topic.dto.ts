@@ -6,8 +6,8 @@ import {
     MaxLength,
     ValidateNested,
 } from 'class-validator';
-import { TopicSectionType } from '../entities/topic.schema';
 import { Type } from 'class-transformer';
+import { TopicSectionType } from "../entities/topic-section.schema";
 
 export class CreateTopicSectionDto {
     @IsNotEmpty()

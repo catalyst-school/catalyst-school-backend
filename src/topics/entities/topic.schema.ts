@@ -1,28 +1,8 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { TopicSection } from './topic-section.schema';
 
 export type TopicDocument = Topic & Document;
-
-export type TopicSectionDocument = TopicSection & Document;
-
-export enum TopicSectionType {
-    THEORY = 'theory',
-    TRAINING = 'training',
-    TEST = 'test',
-}
-
-@Schema()
-export class TopicSection {
-    @Prop({
-        type: String,
-        enum: Object.values(TopicSectionType),
-        required: true,
-    })
-    type: TopicSectionType;
-
-    @Prop()
-    units: [];
-}
 
 @Schema()
 export class Topic {
@@ -38,4 +18,3 @@ export class Topic {
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
-export const TopicSectionSchema = SchemaFactory.createForClass(TopicSection);
