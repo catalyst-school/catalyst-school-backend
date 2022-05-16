@@ -16,7 +16,11 @@ export class CreateTopicSectionDto {
 
     @IsArray()
     @IsOptional()
-    units?: [];
+    theories?: [];
+
+    @IsArray()
+    @IsOptional()
+    tasks?: [];
 }
 
 export class CreateTopicDto {

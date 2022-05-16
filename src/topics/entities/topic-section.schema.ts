@@ -19,7 +19,10 @@ export class TopicSection {
     type: TopicSectionType;
 
     @Prop()
-    units: [];
+    theories?: [];
+
+    @Prop()
+    tasks?: []
 }
 
 export const TopicSectionSchema = SchemaFactory.createForClass(TopicSection);

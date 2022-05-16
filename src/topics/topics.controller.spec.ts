@@ -1,22 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TopicsController } from './topics.controller';
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { TopicsService } from './topics.service';
 import { UpdateTopicDto } from './dto/update-topic.dto';
+import { createTestModule } from '../../test/utils/create-test-module';
+import { createServiceMock } from '../../test/utils/create-service-mock';
 
 describe('TopicsController', () => {
     let app: INestApplication;
     let server: any;
-    const mockTopic = { id: '1'};
-    const serviceMock = {
-        create: jest.fn().mockResolvedValue({}),
-        findAll: jest.fn().mockResolvedValue([mockTopic]),
-        findOne: jest.fn().mockResolvedValue(mockTopic),
-        update: jest.fn().mockResolvedValue({}),
-        remove: jest.fn().mockResolvedValue({}),
-    };
+    const mockTopic = { id: '1' };
+    const serviceMock = createServiceMock(mockTopic);
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -24,10 +20,7 @@ describe('TopicsController', () => {
             providers: [{ provide: TopicsService, useValue: serviceMock }],
         }).compile();
 
-        app = module.createNestApplication();
-        app.useGlobalPipes(new ValidationPipe());
-        await app.init();
-
+        app = await createTestModule(module);
         server = app.getHttpServer();
     });
 
@@ -79,7 +72,7 @@ describe('TopicsController', () => {
         it(`with error wrong title`, () => {
             return request(server)
                 .patch('/topics/1')
-                .send({title: ''} as UpdateTopicDto)
+                .send({ title: '' } as UpdateTopicDto)
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
                     expect(res.body.message).toContain('title should not be empty');
@@ -109,9 +102,7 @@ describe('TopicsController', () => {
                 } as UpdateTopicDto)
                 .expect(HttpStatus.NOT_FOUND)
                 .expect((res) => {
-                    expect(res.body.message).toContain(
-                        'Cannot PATCH /topics',
-                    );
+                    expect(res.body.message).toContain('Cannot PATCH /topics');
                 });
         });
     });
@@ -140,9 +131,7 @@ describe('TopicsController', () => {
 
     describe('remove topic', () => {
         it('remove', () => {
-            return request(server)
-                .delete('/topics/1')
-                .expect(HttpStatus.OK);
+            return request(server).delete('/topics/1').expect(HttpStatus.OK);
         });
     });
 });
