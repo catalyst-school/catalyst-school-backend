@@ -16,7 +16,7 @@ export class CreateTopicSectionDto {
 
     @IsArray()
     @IsOptional()
-    theories?: [];
+    theories?: string[];
 
     @IsArray()
     @IsOptional()

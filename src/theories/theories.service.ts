@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTheoryDto } from './dto/create-theory.dto';
 import { UpdateTheoryDto } from './dto/update-theory.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Theory, TheoryDocument } from './entities/theory.entity';
+import { Theory, TheoryDocument } from './entities/theory.schema';
 import { Model } from 'mongoose';
 
 @Injectable()

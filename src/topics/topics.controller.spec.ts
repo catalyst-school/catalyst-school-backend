@@ -7,6 +7,7 @@ import { TopicsService } from './topics.service';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { createTestModule } from '../../test/utils/create-test-module';
 import { createServiceMock } from '../../test/utils/create-service-mock';
+import { TopicSectionType } from './entities/topic-section.schema';
 
 describe('TopicsController', () => {
     let app: INestApplication;
@@ -28,7 +29,10 @@ describe('TopicsController', () => {
         it(`successfully`, () => {
             return request(server)
                 .post('/topics')
-                .send({ title: 'test' } as CreateTopicDto)
+                .send({
+                    title: 'test',
+                    sections: [{ type: TopicSectionType.THEORY, theories: ['test-id'] }],
+                } as CreateTopicDto)
                 .expect(HttpStatus.CREATED);
         });
 

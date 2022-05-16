@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TheoriesService } from './theories.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Theory } from './entities/theory.entity';
+import { Theory } from './entities/theory.schema';
 
 describe('TheoriesService', () => {
     let service: TheoriesService;

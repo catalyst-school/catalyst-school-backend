@@ -2,8 +2,10 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { TheoriesService } from './theories.service';
 import { CreateTheoryDto } from './dto/create-theory.dto';
 import { UpdateTheoryDto } from './dto/update-theory.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('theories')
+@ApiTags('theories')
 export class TheoriesController {
     constructor(private readonly theoriesService: TheoriesService) {}
 
