@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Topic, TopicDocument } from './entities/topic.schema';
 import { TopicSection, TopicSectionType } from './entities/topic-section.schema';
+import { AppError } from "../shared/models/app-error";
 
 @Injectable()
 export class TopicsService {
@@ -40,12 +41,12 @@ export class TopicsService {
     // todo catch this error
     private validateSectionType(section: TopicSection): void {
         if (section.type === TopicSectionType.THEORY && section.tasks.length)
-            throw new Error("APP: sections with type 'Theory' can't have tasks");
+            throw new AppError("APP: sections with type 'Theory' can't have tasks");
 
         if (section.type === TopicSectionType.TRAINING && section.theories.length)
-            throw new Error("APP: sections with type 'Training' can't have theories");
+            throw new AppError("APP: sections with type 'Training' can't have theories");
 
         if (section.type === TopicSectionType.TEST && section.theories.length)
-            throw new Error("APP: sections with type 'Test' can't have theories");
+            throw new AppError("APP: sections with type 'Test' can't have theories");
     }
 }
