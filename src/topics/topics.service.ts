@@ -40,13 +40,13 @@ export class TopicsService {
 
     // todo catch this error
     private validateSectionType(section: TopicSection): void {
-        if (section.type === TopicSectionType.THEORY && section.tasks.length)
+        if (section.type === TopicSectionType.THEORY && section.tasks?.length)
             throw new AppError("APP: sections with type 'Theory' can't have tasks");
 
-        if (section.type === TopicSectionType.TRAINING && section.theories.length)
+        if (section.type === TopicSectionType.TRAINING && section.theories?.length)
             throw new AppError("APP: sections with type 'Training' can't have theories");
 
-        if (section.type === TopicSectionType.TEST && section.theories.length)
+        if (section.type === TopicSectionType.TEST && section.theories?.length)
             throw new AppError("APP: sections with type 'Test' can't have theories");
     }
 }
