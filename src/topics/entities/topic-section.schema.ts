@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type TopicSectionDocument = TopicSection & Document;
@@ -18,8 +18,16 @@ export class TopicSection {
     })
     type: TopicSectionType;
 
+    @Prop([
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Theory',
+        },
+    ])
+    theories?: string[];
+
     @Prop()
-    units: [];
+    tasks?: [];
 }
 
 export const TopicSectionSchema = SchemaFactory.createForClass(TopicSection);

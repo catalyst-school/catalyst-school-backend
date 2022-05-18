@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { TopicsModule } from './topics/topics.module';
+import { TheoriesModule } from './theories/theories.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { TopicsModule } from './topics/topics.module';
             `mongodb://localhost/${process.env.DATABASE_NAME}`,
         ),
         TopicsModule,
+        TheoriesModule,
     ],
 })
 export class AppModule {}
