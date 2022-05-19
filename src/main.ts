@@ -10,6 +10,14 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalFilters(new HttpExceptionFilter());
 
+    // todo remove on prod
+    app.enableCors({
+        origin: 'http://localhost:4000',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type, Accept',
+        credentials: true,
+    });
+
     const config = new DocumentBuilder()
         .setTitle('Catalyst School')
         .setDescription('Catalyst School API description')
