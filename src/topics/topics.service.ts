@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Topic, TopicDocument } from './entities/topic.schema';
 import { TopicSection, TopicSectionType } from './entities/topic-section.schema';
-import { AppError } from "../shared/models/app-error";
+import { AppError } from '../shared/models/app-error';
 
 @Injectable()
 export class TopicsService {
@@ -24,7 +24,15 @@ export class TopicsService {
     }
 
     async findOne(id: string) {
-        return this.topicModel.findById(id).exec();
+        return this.topicModel
+            .findById(id)
+            .populate({
+                path: 'sections',
+                populate: {
+                    path: 'theories',
+                },
+            })
+            .exec();
     }
 
     async update(id: string, updateTopicDto: UpdateTopicDto) {
@@ -38,7 +46,6 @@ export class TopicsService {
         return this.topicModel.findByIdAndRemove(id);
     }
 
-    // todo catch this error
     private validateSectionType(section: TopicSection): void {
         if (section.type === TopicSectionType.THEORY && section.tasks?.length)
             throw new AppError("APP: sections with type 'Theory' can't have tasks");
