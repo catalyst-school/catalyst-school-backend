@@ -23,7 +23,7 @@ export class TheoriesService {
     }
 
     async update(id: string, updateTheoryDto: UpdateTheoryDto): Promise<Theory> {
-        return this.theoryModel.findByIdAndUpdate(id, updateTheoryDto).exec();
+        return this.theoryModel.findByIdAndUpdate(id, updateTheoryDto, { new: true }).exec();
     }
 
     async remove(id: string) {

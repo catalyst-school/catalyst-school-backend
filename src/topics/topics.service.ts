@@ -39,7 +39,15 @@ export class TopicsService {
         for (let section of updateTopicDto.sections) {
             this.validateSectionType(section);
         }
-        return this.topicModel.findByIdAndUpdate(id, updateTopicDto);
+        return this.topicModel
+            .findByIdAndUpdate(id, updateTopicDto, { new: true })
+            .populate({
+                path: 'sections',
+                populate: {
+                    path: 'theories',
+                },
+            })
+            .exec();
     }
 
     async remove(id: string) {
