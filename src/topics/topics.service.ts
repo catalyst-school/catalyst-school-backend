@@ -12,7 +12,7 @@ export class TopicsService {
     constructor(@InjectModel(Topic.name) private topicModel: Model<TopicDocument>) {}
 
     async create(createTopicDto: CreateTopicDto): Promise<Topic> {
-        for (let section of createTopicDto.sections) {
+        for (let section of (createTopicDto?.sections ?? [])) {
             this.validateSectionType(section);
         }
         const createdTopic = new this.topicModel(createTopicDto);
@@ -36,7 +36,7 @@ export class TopicsService {
     }
 
     async update(id: string, updateTopicDto: UpdateTopicDto) {
-        for (let section of updateTopicDto.sections) {
+        for (let section of updateTopicDto?.sections || []) {
             this.validateSectionType(section);
         }
         return this.topicModel
