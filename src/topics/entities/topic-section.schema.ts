@@ -27,7 +27,12 @@ export class TopicSection {
     theories?: string[];
 
     @Prop()
-    tasks?: [];
+    tasks?: {
+        properties: {
+            title: string,
+            sheetId: number
+        }
+    }[];
 }
 
 export const TopicSectionSchema = SchemaFactory.createForClass(TopicSection);

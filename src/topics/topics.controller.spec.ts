@@ -31,7 +31,20 @@ describe('TopicsController', () => {
                 .post('/topics')
                 .send({
                     title: 'test',
-                    sections: [{ type: TopicSectionType.THEORY, theories: ['test-id'] }],
+                    sections: [
+                        { type: TopicSectionType.THEORY, theories: ['test-id'] },
+                        {
+                            type: TopicSectionType.TRAINING,
+                            tasks: [
+                                {
+                                    properties: {
+                                        title: '234',
+                                        sheetId: 21,
+                                    },
+                                },
+                            ],
+                        },
+                    ],
                 } as CreateTopicDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -69,7 +82,22 @@ describe('TopicsController', () => {
         it(`successfully`, () => {
             return request(server)
                 .patch('/topics/1')
-                .send({ title: 'test' } as UpdateTopicDto)
+                .send({
+                    title: 'test',
+                    sections: [
+                        {
+                            type: TopicSectionType.TRAINING,
+                            tasks: [
+                                {
+                                    properties: {
+                                        title: '234',
+                                        sheetId: 21,
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                } as UpdateTopicDto)
                 .expect(HttpStatus.OK);
         });
 
@@ -94,6 +122,26 @@ describe('TopicsController', () => {
                 .expect((res) => {
                     expect(res.body.message).toContain(
                         'sections.0.type must be a valid enum value',
+                    );
+                });
+        });
+
+        it(`with error wrong task`, () => {
+            return request(server)
+                .patch('/topics/1')
+                .send({
+                    title: 'test',
+                    sections: [
+                        {
+                            type: TopicSectionType.TRAINING,
+                            tasks: [{ some: '123' } as any],
+                        },
+                    ],
+                } as UpdateTopicDto)
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain(
+                        'sections.0.tasks.0.properties should not be empty',
                     );
                 });
         });
