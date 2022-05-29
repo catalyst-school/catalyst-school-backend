@@ -2,12 +2,33 @@ import {
     IsArray,
     IsEnum,
     IsNotEmpty,
+    IsNumber,
     IsOptional,
+    IsString,
     MaxLength,
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TopicSectionType } from "../entities/topic-section.schema";
+import { TopicSectionType } from '../entities/topic-section.schema';
+
+export class CreateTaskPropertiesDTO {
+    @IsNotEmpty()
+    @IsString()
+    @IsNotEmpty()
+    title: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @IsNotEmpty()
+    sheetId: number;
+}
+
+export class CreateTaskDto {
+    @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => CreateTaskPropertiesDTO)
+    properties: CreateTaskPropertiesDTO;
+}
 
 export class CreateTopicSectionDto {
     @IsNotEmpty()
@@ -20,7 +41,9 @@ export class CreateTopicSectionDto {
 
     @IsArray()
     @IsOptional()
-    tasks?: [];
+    @ValidateNested({ each: true })
+    @Type(() => CreateTaskDto)
+    tasks?: CreateTaskDto[];
 }
 
 export class CreateTopicDto {
