@@ -19,14 +19,17 @@ export class GoalsService {
     }
 
     async findOne(id: string) {
-        return this.goalModel.findById(id).exec();
+        return this.goalModel.findById(id).populate('topics').exec();
     }
 
     async update(id: string, updateGoalDto: UpdateGoalDto) {
-        return this.goalModel.findByIdAndUpdate(id, updateGoalDto, { new: true }).exec();
+        return this.goalModel
+            .findByIdAndUpdate(id, updateGoalDto, { new: true })
+            .populate('topics')
+            .exec();
     }
 
     async remove(id: string) {
-        return this.goalModel.remove(id).exec();
+        return this.goalModel.findByIdAndDelete(id).exec();
     }
 }
