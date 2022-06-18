@@ -6,6 +6,7 @@ import { createTestModule } from '../../test/utils/create-test-module';
 import { UsersService } from '../users/users.service';
 import * as request from 'supertest';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { AuthService } from './auth.service';
 
 describe('AuthController', () => {
     let app: INestApplication;
@@ -15,7 +16,10 @@ describe('AuthController', () => {
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AuthController],
-            providers: [{ provide: UsersService, useValue: serviceMock }],
+            providers: [
+                { provide: UsersService, useValue: serviceMock },
+                { provide: AuthService, useValue: createServiceMock(null) },
+            ],
         }).compile();
 
         app = await createTestModule(module);
