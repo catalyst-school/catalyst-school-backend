@@ -47,7 +47,7 @@ describe('AuthService', () => {
     });
 
     it('error: user not found', async () => {
-        userModel.findOne().exec.mockResolvedValue(null);
+        userModel.findOne().exec.mockResolvedValueOnce(null);
         const email = 'test@mail.com';
         await expect(service.login({ email, password: 'test' })).rejects.toThrow(
             'App: Unknown user',
