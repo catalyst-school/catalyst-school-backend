@@ -33,7 +33,7 @@ export class UsersService {
     }
 
     findOne(id: string) {
-        return `This action returns a #${id} user`;
+        return this.userModel.findById(id).exec();
     }
 
     update(id: string, updateUserDto: UpdateUserDto) {
