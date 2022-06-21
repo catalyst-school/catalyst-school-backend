@@ -21,6 +21,7 @@ async function bootstrap() {
     const config = new DocumentBuilder()
         .setTitle('Catalyst School')
         .setDescription('Catalyst School API description')
+        .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('swagger', app, document);

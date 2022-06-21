@@ -5,10 +5,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../users/entities/user.schema';
 import { Model } from 'mongoose';
 import { AppError } from '../shared/models/app-error';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+    constructor(
+        private jwtService: JwtService,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
+    ) {}
 
     async login(loginDto: LoginDto) {
         let userFromDB = await this.userModel.findOne({ email: loginDto.email }).exec();
@@ -18,7 +22,7 @@ export class AuthService {
         const isValidPassword = await bcrypt.compare(loginDto.password, userFromDB.password);
         if (!isValidPassword) throw new AppError('App: Invalid password');
 
-        // todo generate token
-        return 'token granted';
+        const payload = { id: userFromDB._id };
+        return this.jwtService.sign(payload);
     }
 }
