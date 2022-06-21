@@ -7,7 +7,8 @@ import { User, UserSchema } from '../users/entities/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import * as dotenv from 'dotenv';
-import { JwtStrategy } from "./jwt.strategy";
+import { JwtStrategy } from './jwt.strategy';
+import { EmailModule } from '../email/email.module';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ dotenv.config();
             secret: process.env.JWT_SECRET,
             signOptions: { expiresIn: '7d' },
         }),
+        EmailModule,
     ],
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy],

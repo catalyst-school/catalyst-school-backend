@@ -6,11 +6,16 @@ import { UserDto } from '../users/dto/user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { AppError } from '../shared/models/app-error';
+import { EmailService } from '../email/email.service';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-    constructor(private userService: UsersService, private authService: AuthService) {}
+    constructor(
+        private emailService: EmailService,
+        private userService: UsersService,
+        private authService: AuthService,
+    ) {}
 
     @Post('email/login')
     @HttpCode(HttpStatus.OK)
@@ -30,6 +35,8 @@ export class AuthController {
 
     @Post('email/register')
     async register(@Body() createUserDto: CreateUserDto) {
-        return new UserDto(await this.userService.create(createUserDto));
+        const createdUser = new UserDto(await this.userService.create(createUserDto));
+        await this.emailService.emailConfirmation(createdUser.email);
+        return createdUser;
     }
 }
