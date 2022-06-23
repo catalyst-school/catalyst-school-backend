@@ -11,6 +11,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import * as dotenv from 'dotenv';
 import { EmailModule } from './email/email.module';
+import { join } from 'path';
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ dotenv.config();
                 from: '"nest-modules" <modules@nestjs.com>',
             },
             template: {
-                dir: __dirname + '/templates',
+                dir: join(__dirname, 'templates'),
                 adapter: new HandlebarsAdapter(),
                 options: {
                     strict: true,

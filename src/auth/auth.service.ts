@@ -14,6 +14,11 @@ export class AuthService {
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
+    generateToken(user: UserDocument): string {
+        const payload = { id: user._id };
+        return this.jwtService.sign(payload);
+    }
+
     async login(loginDto: LoginDto) {
         let userFromDB = await this.userModel.findOne({ email: loginDto.email }).exec();
         if (!userFromDB) throw new AppError('App: Unknown user');
@@ -22,7 +27,6 @@ export class AuthService {
         const isValidPassword = await bcrypt.compare(loginDto.password, userFromDB.password);
         if (!isValidPassword) throw new AppError('App: Invalid password');
 
-        const payload = { id: userFromDB._id };
-        return this.jwtService.sign(payload);
+        return this.generateToken(userFromDB);
     }
 }

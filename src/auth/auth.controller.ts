@@ -35,8 +35,10 @@ export class AuthController {
 
     @Post('email/register')
     async register(@Body() createUserDto: CreateUserDto) {
-        const createdUser = new UserDto(await this.userService.create(createUserDto));
-        await this.emailService.emailConfirmation(createdUser.email);
-        return createdUser;
+        const user = await this.userService.create(createUserDto);
+        const userDto = new UserDto(user);
+        const token = this.authService.generateToken(user);
+        await this.emailService.emailConfirmation(userDto.email, token);
+        return userDto;
     }
 }
