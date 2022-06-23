@@ -26,6 +26,8 @@ export class AuthController {
             if (e instanceof AppError) {
                 if (e.message === 'App: Unknown user')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+                else if (e.message === 'App: Email not verified')
+                    throw new HttpException(e.message, HttpStatus.UNAUTHORIZED);
                 else if (e.message === 'App: Invalid password')
                     throw new HttpException(e.message, HttpStatus.UNAUTHORIZED);
                 else throw new HttpException(e.message, HttpStatus.BAD_REQUEST);

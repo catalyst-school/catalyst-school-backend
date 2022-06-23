@@ -9,12 +9,17 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppError } from '../shared/models/app-error';
+import { EmailService } from '../email/email.service';
 
 describe('AuthController', () => {
     let app: INestApplication;
     let server: any;
     const userServiceMock = createServiceMock({});
-    const authServiceMock = { login: jest.fn() };
+    const authServiceMock = {
+        login: jest.fn().mockResolvedValue('token'),
+        generateToken: jest.fn().mockResolvedValue('token'),
+    };
+    const emailServiceMock = { emailConfirmation: jest.fn() };
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -22,6 +27,7 @@ describe('AuthController', () => {
             providers: [
                 { provide: UsersService, useValue: userServiceMock },
                 { provide: AuthService, useValue: authServiceMock },
+                { provide: EmailService, useValue: emailServiceMock },
             ],
         }).compile();
 
@@ -106,6 +112,20 @@ describe('AuthController', () => {
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
                     expect(res.body.message).toContain('App: Unknown error');
+                });
+        });
+
+        it(`with error email not confirmed`, () => {
+            authServiceMock.login.mockRejectedValueOnce(new AppError('App: Email not verified'));
+            return request(server)
+                .post('/auth/email/login')
+                .send({
+                    email: 'my@mail.com',
+                    password: '12345678',
+                } as LoginDto)
+                .expect(HttpStatus.UNAUTHORIZED)
+                .expect((res) => {
+                    expect(res.body.message).toContain('App: Email not verified');
                 });
         });
 

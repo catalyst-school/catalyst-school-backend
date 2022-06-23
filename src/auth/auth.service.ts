@@ -22,7 +22,8 @@ export class AuthService {
     async login(loginDto: LoginDto) {
         let userFromDB = await this.userModel.findOne({ email: loginDto.email }).exec();
         if (!userFromDB) throw new AppError('App: Unknown user');
-        // todo check email verification
+
+        if (!userFromDB.emailConfirmed) throw new AppError('App: Email not verified');
 
         const isValidPassword = await bcrypt.compare(loginDto.password, userFromDB.password);
         if (!isValidPassword) throw new AppError('App: Invalid password');
