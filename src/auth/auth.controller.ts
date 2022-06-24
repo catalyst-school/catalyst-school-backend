@@ -1,5 +1,15 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+    Body,
+    Controller,
+    HttpCode,
+    HttpException,
+    HttpStatus,
+    Post,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -7,6 +17,8 @@ import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { AppError } from '../shared/models/app-error';
 import { EmailService } from '../email/email.service';
+import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
+import { UserDocument } from '../users/entities/user.schema';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -42,5 +54,17 @@ export class AuthController {
         const token = this.authService.generateToken(user);
         await this.emailService.emailConfirmation(userDto.email, token);
         return userDto;
+    }
+
+    @Post('email/confirm')
+    @ApiBearerAuth('access-token')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async confirmEmail(@Req() req: Request) {
+        const user = req.user as UserDocument;
+        if (user.emailConfirmed)
+            throw new HttpException('Email already confirmed', HttpStatus.BAD_REQUEST);
+
+        await this.userService.confirmEmail(user.id);
     }
 }

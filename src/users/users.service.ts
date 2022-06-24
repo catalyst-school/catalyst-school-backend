@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './entities/user.schema';
 import { isEmail } from 'class-validator';
-import { AppError } from "../shared/models/app-error";
+import { AppError } from '../shared/models/app-error';
 
 const SALT_ROUNDS = 10;
 
@@ -16,16 +16,22 @@ export class UsersService {
 
     async create(createUserDto: CreateUserDto) {
         if (isEmail(createUserDto.email)) {
-            const existingUser = await this.userModel.findOne({ email: createUserDto.email }).exec();
+            const existingUser = await this.userModel
+                .findOne({ email: createUserDto.email })
+                .exec();
             if (existingUser) {
-                throw new AppError("APP: User already registered");
+                throw new AppError('APP: User already registered');
             }
             createUserDto.password = await bcrypt.hash(createUserDto.password, SALT_ROUNDS);
             const newUser = new this.userModel(createUserDto);
             return await newUser.save();
         } else {
-            throw new AppError("APP: Invalid email");
+            throw new AppError('APP: Invalid email');
         }
+    }
+
+    async confirmEmail(id: string) {
+        await this.userModel.findByIdAndUpdate(id, { emailConfirmed: true }).exec();
     }
 
     findAll() {
