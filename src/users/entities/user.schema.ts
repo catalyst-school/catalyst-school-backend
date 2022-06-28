@@ -21,6 +21,13 @@ export class User {
         type: String,
     })
     name?: string;
+
+    @Prop({
+        type: Boolean,
+        required: true,
+        default: false
+    })
+    emailConfirmed: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

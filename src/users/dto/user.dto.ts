@@ -4,8 +4,8 @@ interface IUserDto {
 }
 
 export class UserDto {
-    private readonly email: string;
-    private readonly name: string;
+    public readonly email: string;
+    public readonly name: string;
 
     constructor(data: IUserDto) {
         this.email = data.email;

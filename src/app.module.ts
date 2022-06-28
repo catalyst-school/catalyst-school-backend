@@ -7,21 +7,47 @@ import { TasksModule } from './tasks/tasks.module';
 import { GoalsModule } from './goals/goals.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import * as dotenv from 'dotenv';
+import { EmailModule } from './email/email.module';
+import { join } from 'path';
+
+dotenv.config();
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        MongooseModule.forRoot(
-            `mongodb://localhost/${process.env.DATABASE_NAME}`,
-        ),
+        MongooseModule.forRoot(`mongodb://localhost/${process.env.DATABASE_NAME}`),
+        MailerModule.forRoot({
+            transport: {
+                host: process.env.EMAIL_HOST,
+                port: 2525,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            },
+            defaults: {
+                from: '"nest-modules" <modules@nestjs.com>',
+            },
+            template: {
+                dir: join(__dirname, 'templates'),
+                adapter: new HandlebarsAdapter(),
+                options: {
+                    strict: true,
+                },
+            },
+        }),
         TopicsModule,
         TheoriesModule,
         TasksModule,
         GoalsModule,
         UsersModule,
         AuthModule,
+        EmailModule,
     ],
 })
 export class AppModule {}

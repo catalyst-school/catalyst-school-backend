@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { createServiceMock } from '../../test/utils/create-service-mock';
 import { createTestModule } from '../../test/utils/create-test-module';
 import { UsersService } from '../users/users.service';
 import * as request from 'supertest';
@@ -9,12 +8,23 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppError } from '../shared/models/app-error';
+import { EmailService } from '../email/email.service';
+import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
+import { JwtAuthGuardMock } from '../shared/guards/jwt-auth.guard.mock';
 
 describe('AuthController', () => {
     let app: INestApplication;
     let server: any;
-    const userServiceMock = createServiceMock({});
-    const authServiceMock = { login: jest.fn() };
+    const userServiceMock = {
+        create: jest.fn().mockResolvedValue({ email: 'test' }),
+        confirmEmail: jest.fn(),
+    };
+    const authServiceMock = {
+        login: jest.fn().mockResolvedValue('token'),
+        generateToken: jest.fn().mockResolvedValue('token'),
+    };
+    const emailServiceMock = { emailConfirmation: jest.fn() };
+    const jwdGuard = JwtAuthGuardMock;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -22,8 +32,12 @@ describe('AuthController', () => {
             providers: [
                 { provide: UsersService, useValue: userServiceMock },
                 { provide: AuthService, useValue: authServiceMock },
+                { provide: EmailService, useValue: emailServiceMock },
             ],
-        }).compile();
+        })
+            .overrideGuard(JwtAuthGuard)
+            .useValue(jwdGuard)
+            .compile();
 
         app = await createTestModule(module);
         server = app.getHttpServer();
@@ -109,6 +123,20 @@ describe('AuthController', () => {
                 });
         });
 
+        it(`with error email not confirmed`, () => {
+            authServiceMock.login.mockRejectedValueOnce(new AppError('App: Email not verified'));
+            return request(server)
+                .post('/auth/email/login')
+                .send({
+                    email: 'my@mail.com',
+                    password: '12345678',
+                } as LoginDto)
+                .expect(HttpStatus.UNAUTHORIZED)
+                .expect((res) => {
+                    expect(res.body.message).toContain('App: Email not verified');
+                });
+        });
+
         it(`with unknown internal server error`, () => {
             authServiceMock.login.mockRejectedValueOnce(new Error('Server error'));
             return request(server)
@@ -135,6 +163,23 @@ describe('AuthController', () => {
                     expect(res.body.message).toContain('password must be a string');
                     expect(res.body.message).toContain('password should not be empty');
                 });
+        });
+    });
+
+    describe('confirm email', () => {
+        it(`successfully`, () => {
+            jwdGuard.canActivate.mockImplementationOnce((context) => {
+                const req = context.switchToHttp().getRequest();
+                req.user = { id: '123', email: 'test@email.com', emailConfirmed: false };
+                return true;
+            });
+
+            return request(server).post('/auth/email/confirm').send().expect(HttpStatus.OK);
+        });
+
+        it(`with error unauthorized`, () => {
+            jwdGuard.canActivate.mockReturnValueOnce(false);
+            return request(server).post('/auth/email/confirm').send().expect(HttpStatus.FORBIDDEN);
         });
     });
 });

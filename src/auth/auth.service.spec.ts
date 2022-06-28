@@ -42,6 +42,7 @@ describe('AuthService', () => {
 
     it('should return jwt token on login', async () => {
         const email = 'test@mail.com';
+        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
         await service.login({ email, password: 'test' });
         expect(jwtService.sign).toHaveBeenCalledWith({ id: user._id });
     });
@@ -54,10 +55,19 @@ describe('AuthService', () => {
         );
     });
 
+    it('error: email not confirmed', async () => {
+        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: false });
+        const email = 'test@mail.com';
+        await expect(service.login({ email, password: 'test' })).rejects.toThrow(
+            'App: Email not verified',
+        );
+    });
+
     it('error: invalid password', async () => {
         const email = 'test@mail.com';
-        await expect(service.login({ email, password: 'wrong password' })).rejects.toThrow(
-            'App: Invalid password',
-        );
+        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
+        await expect(
+            service.login({ email, password: 'wrong password' }),
+        ).rejects.toThrow('App: Invalid password');
     });
 });
