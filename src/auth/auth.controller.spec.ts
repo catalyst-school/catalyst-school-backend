@@ -11,7 +11,6 @@ import { AppError } from '../shared/models/app-error';
 import { EmailService } from '../email/email.service';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { JwtAuthGuardMock } from '../shared/guards/jwt-auth.guard.mock';
-import { JwtStrategy } from './jwt.strategy';
 
 describe('AuthController', () => {
     let app: INestApplication;
@@ -34,7 +33,6 @@ describe('AuthController', () => {
                 { provide: UsersService, useValue: userServiceMock },
                 { provide: AuthService, useValue: authServiceMock },
                 { provide: EmailService, useValue: emailServiceMock },
-                JwtStrategy,
             ],
         })
             .overrideGuard(JwtAuthGuard)
