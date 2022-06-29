@@ -1,1 +1,1 @@
-export const JwtServiceMock = { sign: jest.fn() };
+export const JwtServiceMock = { sign: jest.fn().mockReturnValue("token") };

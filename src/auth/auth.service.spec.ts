@@ -12,7 +12,8 @@ import { JwtServiceMock } from '../../test/mocks/jwt.serivce.mock';
 describe('AuthService', () => {
     let service: AuthService;
     let jwtService = JwtServiceMock;
-    const user = { _id: 'test_id', password: '' };
+    let emailService = EmailServiceMock;
+    const user = { _id: 'test_id', password: '', email: 'test@mail.com' };
     let userModel = createModelMock(user);
 
     beforeAll(async () => {
@@ -33,13 +34,14 @@ describe('AuthService', () => {
                 },
                 {
                     provide: EmailService,
-                    useValue: EmailServiceMock,
+                    useValue: emailService,
                 },
             ],
         }).compile();
 
         service = module.get<AuthService>(AuthService);
         jwtService = module.get(JwtService);
+        emailService = module.get(EmailService);
         userModel = module.get(getModelToken(User.name));
     });
 
@@ -77,6 +79,20 @@ describe('AuthService', () => {
             await expect(service.login({ email, password: 'wrong password' })).rejects.toThrow(
                 'App: Invalid password',
             );
+        });
+    });
+
+    describe('forgot password', () => {
+        it('should send email', async () => {
+            const email = 'test@mail.com';
+            await service.forgotPassword({ email });
+            expect(emailService.forgotPassword).toHaveBeenCalledWith(email, 'token');
+        });
+
+        it('error unknown user', async () => {
+            const email = 'test@mail.com';
+            userModel.findOne().exec.mockResolvedValueOnce(null);
+            await expect(service.forgotPassword({ email })).rejects.toThrow('App: Unknown user');
         });
     });
 });
