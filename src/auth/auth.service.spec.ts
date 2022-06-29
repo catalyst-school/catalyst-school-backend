@@ -5,10 +5,13 @@ import { User } from '../users/entities/user.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { createModelMock } from '../../test/utils/create-model-mock';
+import { EmailService } from '../email/email.service';
+import { EmailServiceMock } from '../email/email.service.mock';
+import { JwtServiceMock } from '../../test/mocks/jwt.serivce.mock';
 
 describe('AuthService', () => {
     let service: AuthService;
-    let jwtService = { sign: jest.fn() };
+    let jwtService = JwtServiceMock;
     const user = { _id: 'test_id', password: '' };
     let userModel = createModelMock(user);
 
@@ -28,6 +31,10 @@ describe('AuthService', () => {
                     provide: JwtService,
                     useValue: jwtService,
                 },
+                {
+                    provide: EmailService,
+                    useValue: EmailServiceMock,
+                },
             ],
         }).compile();
 
@@ -40,34 +47,36 @@ describe('AuthService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should return jwt token on login', async () => {
-        const email = 'test@mail.com';
-        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
-        await service.login({ email, password: 'test' });
-        expect(jwtService.sign).toHaveBeenCalledWith({ id: user._id });
-    });
+    describe('login', () => {
+        it('should return jwt token', async () => {
+            const email = 'test@mail.com';
+            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
+            await service.login({ email, password: 'test' });
+            expect(jwtService.sign).toHaveBeenCalledWith({ id: user._id });
+        });
 
-    it('error: user not found', async () => {
-        userModel.findOne().exec.mockResolvedValueOnce(null);
-        const email = 'test@mail.com';
-        await expect(service.login({ email, password: 'test' })).rejects.toThrow(
-            'App: Unknown user',
-        );
-    });
+        it('error: user not found', async () => {
+            userModel.findOne().exec.mockResolvedValueOnce(null);
+            const email = 'test@mail.com';
+            await expect(service.login({ email, password: 'test' })).rejects.toThrow(
+                'App: Unknown user',
+            );
+        });
 
-    it('error: email not confirmed', async () => {
-        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: false });
-        const email = 'test@mail.com';
-        await expect(service.login({ email, password: 'test' })).rejects.toThrow(
-            'App: Email not verified',
-        );
-    });
+        it('error: email not confirmed', async () => {
+            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: false });
+            const email = 'test@mail.com';
+            await expect(service.login({ email, password: 'test' })).rejects.toThrow(
+                'App: Email not verified',
+            );
+        });
 
-    it('error: invalid password', async () => {
-        const email = 'test@mail.com';
-        userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
-        await expect(
-            service.login({ email, password: 'wrong password' }),
-        ).rejects.toThrow('App: Invalid password');
+        it('error: invalid password', async () => {
+            const email = 'test@mail.com';
+            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
+            await expect(service.login({ email, password: 'wrong password' })).rejects.toThrow(
+                'App: Invalid password',
+            );
+        });
     });
 });

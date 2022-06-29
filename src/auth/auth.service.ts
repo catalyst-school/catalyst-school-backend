@@ -6,12 +6,15 @@ import { User, UserDocument } from '../users/entities/user.schema';
 import { Model } from 'mongoose';
 import { AppError } from '../shared/models/app-error';
 import { JwtService } from '@nestjs/jwt';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class AuthService {
     constructor(
         private jwtService: JwtService,
         @InjectModel(User.name) private userModel: Model<UserDocument>,
+        private emailService: EmailService
     ) {}
 
     generateToken(user: UserDocument): string {
@@ -29,5 +32,13 @@ export class AuthService {
         if (!isValidPassword) throw new AppError('App: Invalid password');
 
         return this.generateToken(userFromDB);
+    }
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+        let userFromDB = await this.userModel.findOne({ email: forgotPasswordDto.email }).exec();
+        if (!userFromDB) throw new AppError('App: Unknown user');
+
+        const token = this.generateToken(userFromDB);
+        await this.emailService.forgotPassword(userFromDB.email, token);
     }
 }

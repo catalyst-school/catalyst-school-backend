@@ -17,4 +17,16 @@ export class EmailService {
             }
         });
     }
+
+    async forgotPassword(email: string, token: string) {
+        await this.mailerService.sendMail({
+            to: email,
+            from: 'noreply@catalyst-school.ru',
+            subject: 'Восстановление пароля на сайте школы Катализатор',
+            template: 'forgot-password',
+            context: {
+                forgotPasswordLink: `${this.configService.get("HOST")}/forgot-password?token=${token}`
+            }
+        });
+    }
 }

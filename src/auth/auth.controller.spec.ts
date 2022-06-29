@@ -11,20 +11,16 @@ import { AppError } from '../shared/models/app-error';
 import { EmailService } from '../email/email.service';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { JwtAuthGuardMock } from '../shared/guards/jwt-auth.guard.mock';
+import { AuthServiceMock } from './auth.service.mock';
+import { UserServiceMock } from '../users/user.service.mock';
 
 describe('AuthController', () => {
     let app: INestApplication;
     let server: any;
-    const userServiceMock = {
-        create: jest.fn().mockResolvedValue({ email: 'test' }),
-        confirmEmail: jest.fn(),
-    };
-    const authServiceMock = {
-        login: jest.fn().mockResolvedValue('token'),
-        generateToken: jest.fn().mockResolvedValue('token'),
-    };
+    const userServiceMock = UserServiceMock;
     const emailServiceMock = { emailConfirmation: jest.fn() };
     const jwdGuard = JwtAuthGuardMock;
+    const authServiceMock = AuthServiceMock;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -180,6 +176,34 @@ describe('AuthController', () => {
         it(`with error unauthorized`, () => {
             jwdGuard.canActivate.mockReturnValueOnce(false);
             return request(server).post('/auth/email/confirm').send().expect(HttpStatus.FORBIDDEN);
+        });
+    });
+
+    describe('forgot password', () => {
+        it(`successfully`, () => {
+            return request(server)
+                .post('/auth/email/forgot-password')
+                .send({ email: 'some@mail.com' })
+                .expect(HttpStatus.OK);
+        });
+
+        it(`with error wrong email`, () => {
+            return request(server)
+                .post('/auth/email/forgot-password')
+                .send({})
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('email should not be empty');
+                    expect(res.body.message).toContain('email must be an email');
+                });
+        });
+
+        it(`with error user not found`, () => {
+            authServiceMock.forgotPassword.mockRejectedValueOnce(new AppError('App: Unknown user'));
+            return request(server)
+                .post('/auth/email/forgot-password')
+                .send({ email: 'some@mail.com' })
+                .expect(HttpStatus.NOT_FOUND);
         });
     });
 });

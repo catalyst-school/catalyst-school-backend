@@ -19,6 +19,7 @@ import { AppError } from '../shared/models/app-error';
 import { EmailService } from '../email/email.service';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { UserDocument } from '../users/entities/user.schema';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -66,5 +67,19 @@ export class AuthController {
             throw new HttpException('Email already confirmed', HttpStatus.BAD_REQUEST);
 
         await this.userService.confirmEmail(user.id);
+    }
+
+    @Post('email/forgot-password')
+    @HttpCode(HttpStatus.OK)
+    async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+        try {
+            return await this.authService.forgotPassword(forgotPasswordDto);
+        } catch (e) {
+            if (e instanceof AppError) {
+                if (e.message === 'App: Unknown user')
+                    throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+                else throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+            } else throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
