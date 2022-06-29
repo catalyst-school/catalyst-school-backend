@@ -25,7 +25,7 @@ export class EmailService {
             subject: 'Восстановление пароля на сайте школы Катализатор',
             template: 'forgot-password',
             context: {
-                forgotPasswordLink: `${this.configService.get("HOST")}/forgot-password?token=${token}`
+                forgotPasswordLink: `${this.configService.get("HOST")}/reset-password?token=${token}`
             }
         });
     }

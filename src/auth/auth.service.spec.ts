@@ -1,20 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { getModelToken } from '@nestjs/mongoose';
-import { User } from '../users/entities/user.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { createModelMock } from '../../test/utils/create-model-mock';
 import { EmailService } from '../email/email.service';
 import { EmailServiceMock } from '../email/email.service.mock';
 import { JwtServiceMock } from '../../test/mocks/jwt.serivce.mock';
+import { UsersService } from '../users/users.service';
+import { UserServiceMock } from '../users/user.service.mock';
 
 describe('AuthService', () => {
     let service: AuthService;
     let jwtService = JwtServiceMock;
     let emailService = EmailServiceMock;
+    let userService = UserServiceMock;
     const user = { _id: 'test_id', password: '', email: 'test@mail.com' };
-    let userModel = createModelMock(user);
 
     beforeAll(async () => {
         user.password = await bcrypt.hash('test', 10);
@@ -25,10 +24,6 @@ describe('AuthService', () => {
             providers: [
                 AuthService,
                 {
-                    provide: getModelToken(User.name),
-                    useValue: userModel,
-                },
-                {
                     provide: JwtService,
                     useValue: jwtService,
                 },
@@ -36,13 +31,17 @@ describe('AuthService', () => {
                     provide: EmailService,
                     useValue: emailService,
                 },
+                {
+                    provide: UsersService,
+                    useValue: userService,
+                },
             ],
         }).compile();
 
         service = module.get<AuthService>(AuthService);
         jwtService = module.get(JwtService);
         emailService = module.get(EmailService);
-        userModel = module.get(getModelToken(User.name));
+        userService = module.get(UsersService);
     });
 
     it('should be defined', () => {
@@ -52,13 +51,13 @@ describe('AuthService', () => {
     describe('login', () => {
         it('should return jwt token', async () => {
             const email = 'test@mail.com';
-            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
+            userService.findByEmail.mockResolvedValueOnce({ ...user, emailConfirmed: true });
             await service.login({ email, password: 'test' });
             expect(jwtService.sign).toHaveBeenCalledWith({ id: user._id });
         });
 
         it('error: user not found', async () => {
-            userModel.findOne().exec.mockResolvedValueOnce(null);
+            userService.findByEmail.mockResolvedValueOnce(null);
             const email = 'test@mail.com';
             await expect(service.login({ email, password: 'test' })).rejects.toThrow(
                 'App: Unknown user',
@@ -66,7 +65,7 @@ describe('AuthService', () => {
         });
 
         it('error: email not confirmed', async () => {
-            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: false });
+            userService.findByEmail.mockResolvedValueOnce({ ...user, emailConfirmed: false });
             const email = 'test@mail.com';
             await expect(service.login({ email, password: 'test' })).rejects.toThrow(
                 'App: Email not verified',
@@ -75,7 +74,7 @@ describe('AuthService', () => {
 
         it('error: invalid password', async () => {
             const email = 'test@mail.com';
-            userModel.findOne().exec.mockResolvedValueOnce({ ...user, emailConfirmed: true });
+            userService.findByEmail.mockResolvedValueOnce({ ...user, emailConfirmed: true });
             await expect(service.login({ email, password: 'wrong password' })).rejects.toThrow(
                 'App: Invalid password',
             );
@@ -84,15 +83,31 @@ describe('AuthService', () => {
 
     describe('forgot password', () => {
         it('should send email', async () => {
-            const email = 'test@mail.com';
+            const email = 'some@mail.com'; // same email as mocked user in user service
             await service.forgotPassword({ email });
             expect(emailService.forgotPassword).toHaveBeenCalledWith(email, 'token');
         });
 
         it('error unknown user', async () => {
             const email = 'test@mail.com';
-            userModel.findOne().exec.mockResolvedValueOnce(null);
+            userService.findByEmail.mockResolvedValueOnce(null);
             await expect(service.forgotPassword({ email })).rejects.toThrow('App: Unknown user');
+        });
+    });
+
+    describe('reset password', () => {
+        it('should update password', async () => {
+            const userId = '123'; // same id as mocked in user service
+            await service.resetPassword(userId, { password: 'NewPassword' });
+            expect(userService.updatePassword).toHaveBeenCalled();
+        });
+
+        it('error unknown user', async () => {
+            const userId = '123';
+            userService.findById.mockResolvedValueOnce(null);
+            await expect(
+                service.resetPassword(userId, { password: 'NewPassword' }),
+            ).rejects.toThrow('App: Unknown user');
         });
     });
 });

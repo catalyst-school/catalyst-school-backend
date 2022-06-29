@@ -19,7 +19,7 @@ describe('AuthController', () => {
     let server: any;
     const userServiceMock = UserServiceMock;
     const emailServiceMock = { emailConfirmation: jest.fn() };
-    const jwdGuard = JwtAuthGuardMock;
+    const jwtGuard = JwtAuthGuardMock;
     const authServiceMock = AuthServiceMock;
 
     beforeEach(async () => {
@@ -32,7 +32,7 @@ describe('AuthController', () => {
             ],
         })
             .overrideGuard(JwtAuthGuard)
-            .useValue(jwdGuard)
+            .useValue(jwtGuard)
             .compile();
 
         app = await createTestModule(module);
@@ -164,7 +164,7 @@ describe('AuthController', () => {
 
     describe('confirm email', () => {
         it(`successfully`, () => {
-            jwdGuard.canActivate.mockImplementationOnce((context) => {
+            jwtGuard.canActivate.mockImplementationOnce((context) => {
                 const req = context.switchToHttp().getRequest();
                 req.user = { id: '123', email: 'test@email.com', emailConfirmed: false };
                 return true;
@@ -174,7 +174,7 @@ describe('AuthController', () => {
         });
 
         it(`with error unauthorized`, () => {
-            jwdGuard.canActivate.mockReturnValueOnce(false);
+            jwtGuard.canActivate.mockReturnValueOnce(false);
             return request(server).post('/auth/email/confirm').send().expect(HttpStatus.FORBIDDEN);
         });
     });
@@ -203,6 +203,34 @@ describe('AuthController', () => {
             return request(server)
                 .post('/auth/email/forgot-password')
                 .send({ email: 'some@mail.com' })
+                .expect(HttpStatus.NOT_FOUND);
+        });
+    });
+
+    describe('reset password', () => {
+        it(`successfully`, () => {
+            return request(server)
+                .post('/auth/email/reset-password')
+                .send({ password: 'somePass' })
+                .expect(HttpStatus.OK);
+        });
+
+        it(`with error wrong password format`, () => {
+            return request(server)
+                .post('/auth/email/reset-password')
+                .send({})
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('password must be a string');
+                    expect(res.body.message).toContain('password should not be empty');
+                });
+        });
+
+        it(`with error user not found`, () => {
+            authServiceMock.resetPassword.mockRejectedValueOnce(new AppError('App: Unknown user'));
+            return request(server)
+                .post('/auth/email/reset-password')
+                .send({ password: 'somePass' })
                 .expect(HttpStatus.NOT_FOUND);
         });
     });
