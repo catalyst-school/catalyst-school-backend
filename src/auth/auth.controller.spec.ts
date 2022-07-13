@@ -234,4 +234,33 @@ describe('AuthController', () => {
                 .expect(HttpStatus.NOT_FOUND);
         });
     });
+
+
+    describe('resend confirmation link', () => {
+        it(`successfully`, () => {
+            return request(server)
+                .post('/auth/email/resend-confirmation')
+                .send({ email: 'email@email.com' })
+                .expect(HttpStatus.OK);
+        });
+
+        it(`with error wrong email format`, () => {
+            return request(server)
+                .post('/auth/email/resend-confirmation')
+                .send({})
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('email should not be empty');
+                    expect(res.body.message).toContain('email must be an email');
+                });
+        });
+
+        it(`with error user not found`, () => {
+            authServiceMock.resendConfirmation.mockRejectedValueOnce(new AppError('App: Unknown user'));
+            return request(server)
+                .post('/auth/email/resend-confirmation')
+                .send({ email: 'email@email.com' })
+                .expect(HttpStatus.NOT_FOUND);
+        });
+    });
 });

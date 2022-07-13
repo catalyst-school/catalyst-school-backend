@@ -8,6 +8,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { EmailService } from '../email/email.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UsersService } from '../users/users.service';
+import { ResendConfirmationDto } from "./dto/resend-confirmation.dto";
 
 @Injectable()
 export class AuthService {
@@ -47,5 +48,13 @@ export class AuthService {
         if (!userFromDB) throw new AppError('App: Unknown user');
 
         await this.userService.updatePassword(userFromDB._id, resetPasswordDto.password);
+    }
+
+    async resendConfirmation(resendConfirmationDto: ResendConfirmationDto) {
+        let userFromDB = await this.userService.findByEmail(resendConfirmationDto.email);
+        if (!userFromDB) throw new AppError('App: Unknown user');
+
+        const token = this.generateToken(userFromDB);
+        await this.emailService.emailConfirmation(userFromDB.email, token);
     }
 }
