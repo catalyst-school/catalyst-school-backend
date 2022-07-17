@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { UserDocument } from '../users/entities/user.schema';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendConfirmationDto } from './dto/resend-confirmation.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -94,6 +95,20 @@ export class AuthController {
                 (req.user as UserDocument)?._id,
                 resetPasswordDto,
             );
+        } catch (e) {
+            if (e instanceof AppError) {
+                if (e.message === 'App: Unknown user')
+                    throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+                else throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+            } else throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Post('email/resend-confirmation')
+    @HttpCode(HttpStatus.OK)
+    async resendConfirmationLink(@Body() resendConfirmationDto: ResendConfirmationDto) {
+        try {
+            return await this.authService.resendConfirmation(resendConfirmationDto);
         } catch (e) {
             if (e instanceof AppError) {
                 if (e.message === 'App: Unknown user')

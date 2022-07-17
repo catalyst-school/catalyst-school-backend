@@ -110,4 +110,20 @@ describe('AuthService', () => {
             ).rejects.toThrow('App: Unknown user');
         });
     });
+
+    describe('resend confirmation link', () => {
+        it('should send email', async () => {
+            const email = 'some@mail.com'; // same as mocked user
+            await service.resendConfirmation({ email });
+            expect(emailService.emailConfirmation).toHaveBeenCalledWith(email, 'token');
+        });
+
+        it('error unknown user', async () => {
+            userService.findByEmail.mockResolvedValueOnce(null);
+            const email = 'email@email.com';
+            await expect(service.resendConfirmation({ email })).rejects.toThrow(
+                'App: Unknown user',
+            );
+        });
+    });
 });
