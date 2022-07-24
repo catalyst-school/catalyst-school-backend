@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import * as dotenv from 'dotenv';
 import { EmailModule } from './email/email.module';
+import { TopicSessionsModule } from './topic-sessions/topic-sessions.module';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ dotenv.config();
         UsersModule,
         AuthModule,
         EmailModule,
+        TopicSessionsModule,
     ],
 })
 export class AppModule {}
