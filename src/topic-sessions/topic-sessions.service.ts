@@ -9,7 +9,7 @@ import { AppError } from '../shared/models/app-error';
 export class TopicSessionsService {
     constructor(@InjectModel(TopicSession.name) private model: Model<TopicSessionDocument>) {}
 
-    async create(userId, createTopicSessionDto: CreateTopicSessionDto) {
+    async create(userId: string, createTopicSessionDto: CreateTopicSessionDto) {
         // todo check that this topic belongs to user's goal
         const oldSession = await this.model
             .findOne({ topic: createTopicSessionDto.topic, user: userId })
