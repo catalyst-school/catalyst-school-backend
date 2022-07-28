@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserGoal } from './entities/user-goal.schema';
 import { UserGoalService } from './user-goal.service';
@@ -15,7 +15,7 @@ export class UserGoalController {
         return this.userGoalService.create(CreateUserGoalDto);
     }
 
-    @Post()
+    @Put()
     update(@Param('id') id: string, @Body() updateDataDto: UpdateUserGoalDto): Promise<UserGoal> {
         return this.userGoalService.update(id, updateDataDto);
     }
