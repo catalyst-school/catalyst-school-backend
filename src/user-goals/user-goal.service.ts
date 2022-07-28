@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserGoal, UserGoalDocument } from './entities/user-goal.schema';
 import { Model } from 'mongoose';
+import { CreateUserGoalDto } from './dto/create-user-goal.dto';
+import { UpdateUserGoalDto } from './dto/update-user-goal.dto';
 
 @Injectable()
 export class UserGoalService {
     constructor(@InjectModel(UserGoal.name) private userGoalModel: Model<UserGoalDocument>) {}
 
-    async create(createUserGoalDto): Promise<UserGoal> {
+    async create(createUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
         const createUserGoal = new this.userGoalModel(createUserGoalDto);
         return createUserGoal.save();
     }
@@ -20,7 +22,7 @@ export class UserGoalService {
         return this.userGoalModel.findById(id).exec();
     }
 
-    async update(id: string, updateUserGoalDto): Promise<UserGoal> {
+    async update(id: string, updateUserGoalDto: UpdateUserGoalDto): Promise<UserGoal> {
         return this.userGoalModel.findByIdAndUpdate(id, updateUserGoalDto, { new: true }).exec();
     }
 

@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import * as dotenv from 'dotenv';
 import { EmailModule } from './email/email.module';
 import { TopicSessionsModule } from './topic-sessions/topic-sessions.module';
-import { UserGoalModule } from './user-goal/user-goal.module';
+import { UserGoalModule } from './user-goals/user-goal.module';
 
 dotenv.config();
 
