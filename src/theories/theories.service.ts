@@ -26,7 +26,7 @@ export class TheoriesService {
         return this.theoryModel.findByIdAndUpdate(id, updateTheoryDto, { new: true }).exec();
     }
 
-    async remove(id: string) {
+    async remove(id: string): Promise<Theory> {
         return this.theoryModel.findByIdAndRemove(id);
     }
 }
