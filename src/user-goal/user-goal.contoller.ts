@@ -5,7 +5,7 @@ import { UserGoalService } from './user-goal.service';
 
 @Controller('user-goal')
 @ApiTags()
-export class UserGoalContoller {
+export class UserGoalController {
     constructor(private readonly userGoalService: UserGoalService) {}
 
     @Post()
