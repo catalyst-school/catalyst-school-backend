@@ -9,32 +9,33 @@ export class UserGoal {
         type: String,
         required: true,
         trim: true,
+        default: 0,
     })
-    progress: string;
+    progress: number;
 
-    @Prop([
+    @Prop(
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Goal',
         },
-    ])
-    goal?: string[];
+    )
+    goal: string;
 
-    @Prop([
+    @Prop(
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
         },
-    ])
+    )
     user: string;
 
-    @Prop([
+    @Prop(
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Topic',
         },
-    ])
-    currentTopic: string[];
+    )
+    currentTopic: string;
 }
 
 export const UserGoalSchema = SchemaFactory.createForClass(UserGoal);

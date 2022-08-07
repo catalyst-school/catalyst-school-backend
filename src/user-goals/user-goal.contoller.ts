@@ -1,18 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGoal } from './entities/user-goal.schema';
 import { UserGoalService } from './user-goal.service';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
 import { UpdateUserGoalDto } from './dto/update-user-goal.dto';
+import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('user-goal')
-@ApiTags()
+@ApiTags('user-goal')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class UserGoalController {
     constructor(private readonly userGoalService: UserGoalService) {}
 
     @Post()
-    create(@Body() CreateUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
-        return this.userGoalService.create(CreateUserGoalDto);
+    create(@Req() req: Request, @Body() CreateUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
+        const user = req.user;
+        return this.userGoalService.create({...CreateUserGoalDto, user});
     }
 
     @Put()
