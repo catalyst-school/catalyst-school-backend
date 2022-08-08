@@ -43,8 +43,6 @@ describe('UserGoal', () => {
                 .send({})
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
-                    expect(res.body.message).toContain('currentTopic must be a string');
-                    expect(res.body.message).toContain('currentTopic must be a mongodb id');
                     expect(res.body.message).toContain('goal must be a mongodb id');
                     expect(res.body.message).toContain('goal should not be empty');
                     expect(res.body.message).toContain('goal must be a string');
