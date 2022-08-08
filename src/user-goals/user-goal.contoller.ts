@@ -3,7 +3,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGoal } from './entities/user-goal.schema';
 import { UserGoalService } from './user-goal.service';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
-import { UpdateUserGoalDto } from './dto/update-user-goal.dto';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { Request } from 'express';
 
@@ -17,12 +16,8 @@ export class UserGoalController {
     @Post()
     create(@Req() req: Request, @Body() CreateUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
         const user = req.user;
-        return this.userGoalService.create({...CreateUserGoalDto, user});
-    }
 
-    @Put()
-    update(@Param('id') id: string, @Body() updateDataDto: UpdateUserGoalDto): Promise<UserGoal> {
-        return this.userGoalService.update(id, updateDataDto);
+        return this.userGoalService.create({...CreateUserGoalDto, user: user['_id']});
     }
 
     @Get()

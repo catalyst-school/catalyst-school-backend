@@ -6,15 +6,15 @@ export type UserGoalDocument = UserGoal & Document;
 @Schema()
 export class UserGoal {
     @Prop({
-        type: String,
+        type: Number,
         required: true,
-        trim: true,
         default: 0,
     })
     progress: number;
 
     @Prop(
         {
+            required: true,
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Goal',
         },
@@ -23,6 +23,7 @@ export class UserGoal {
 
     @Prop(
         {
+            required: true,
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
         },
