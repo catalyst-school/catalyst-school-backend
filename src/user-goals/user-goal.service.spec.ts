@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { UserGoal } from './entities/user-goal.schema';
 import { UserGoalService } from './user-goal.service';
 
-describe('TheoriesService', () => {
+describe('UserGoalService', () => {
     let service: UserGoalService;
 
     beforeEach(async () => {

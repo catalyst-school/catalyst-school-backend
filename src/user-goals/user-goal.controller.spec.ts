@@ -12,9 +12,9 @@ import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 describe('UserGoal', () => {
     let app: INestApplication;
     let server: any;
-    const mockTheory = { content: 'Test content' };
+    const userGoal = { content: 'Test content' };
     const jwtGuard = JwtAuthGuardMock;
-    const serviceMock = createServiceMock(mockTheory);
+    const serviceMock = createServiceMock(userGoal);
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -33,7 +33,7 @@ describe('UserGoal', () => {
         it('successfully', () => {
             return request(server)
                 .post('/user-goal')
-                .send({ currentTopic: '6288b59786e37c69fcf618a0', goal: '6288b59786e37c69fcf618a0' })
+                .send({ goal: '6288b59786e37c69fcf618a0' })
                 .expect(HttpStatus.CREATED);
         });
 
