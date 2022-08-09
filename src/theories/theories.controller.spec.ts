@@ -25,14 +25,14 @@ describe('TheoriesController', () => {
     });
 
     describe('create theory', () => {
-        it(`successfully`, () => {
+        it('successfully', () => {
             return request(server)
                 .post('/theories')
                 .send({ title: 'test', content: 'Test content' } as CreateTheoryDto)
                 .expect(HttpStatus.CREATED);
         });
 
-        it(`with error wrong  content`, () => {
+        it(`with error wrong content`, () => {
             return request(server)
                 .post('/theories')
                 .send({} as CreateTheoryDto)
