@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { TopicSessionsModule } from './topic-sessions/topic-sessions.module';
 import { TaskInstancesModule } from './task-instances/task-instances.module';
+import { UserGoalModule } from './user-goals/user-goal.module';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ dotenv.config();
         EmailModule,
         TopicSessionsModule,
         TaskInstancesModule,
+        UserGoalModule,
     ],
 })
 export class AppModule {}
