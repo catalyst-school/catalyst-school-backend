@@ -1,10 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserGoal } from './entities/user-goal.schema';
-import { UserGoalService } from './user-goal.service';
+import { FilterOptions, UserGoalService } from './user-goal.service';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { Request } from 'express';
+import { UserDocument } from '../users/entities/user.schema';
+import { AppError } from '../shared/models/app-error';
 
 @Controller('user-goal')
 @ApiTags('user-goal')
@@ -16,13 +29,20 @@ export class UserGoalController {
     @Post()
     create(@Req() req: Request, @Body() CreateUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
         const user = req.user;
-
-        return this.userGoalService.create({...CreateUserGoalDto, user: user['_id']});
+        try {
+            return this.userGoalService.create({ ...CreateUserGoalDto, user: user['_id'] });
+        } catch (e) {
+            if (e instanceof AppError) {
+                if (e.message === 'APP: Goal not found')
+                    throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+            } else throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get()
-    getAll(): Promise<UserGoal[]> {
-        return this.userGoalService.findAll();
+    getAll(@Req() req: Request): Promise<UserGoal[]> {
+        const options: FilterOptions = { user: (req.user as UserDocument)._id };
+        return this.userGoalService.findAll(options);
     }
 
     @Get(':id')
@@ -31,7 +51,7 @@ export class UserGoalController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string): Promise<UserGoal>  {
+    remove(@Param('id') id: string): Promise<UserGoal> {
         return this.userGoalService.remove(id);
     }
 }
