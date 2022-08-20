@@ -40,6 +40,14 @@ export class TopicSession {
         required: true,
     })
     status: TopicSessionStatus;
+
+    @Prop([
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Task',
+        },
+    ])
+    tasks?: string[];
 }
 
 export const TopicSessionSchema = SchemaFactory.createForClass(TopicSession);

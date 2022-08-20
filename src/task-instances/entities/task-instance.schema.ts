@@ -15,7 +15,7 @@ export class TaskInstance {
         type: String,
         required: true,
     })
-    desc: string;
+    description: string;
 
     @Prop({
         type: String,

@@ -14,7 +14,7 @@ export class Topic {
     title: string;
 
     @Prop([TopicSection])
-    sections?: [];
+    sections?: TopicSection[];
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
