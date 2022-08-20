@@ -27,10 +27,10 @@ export class UserGoalController {
     constructor(private readonly userGoalService: UserGoalService) {}
 
     @Post()
-    create(@Req() req: Request, @Body() CreateUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
+    async create(@Req() req: Request, @Body() createUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
         const user = req.user;
         try {
-            return this.userGoalService.create({ ...CreateUserGoalDto, user: user['_id'] });
+            return await this.userGoalService.create({ ...createUserGoalDto, user: user['_id'] });
         } catch (e) {
             if (e instanceof AppError) {
                 if (e.message === 'APP: Goal not found')
