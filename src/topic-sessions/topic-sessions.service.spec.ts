@@ -3,6 +3,10 @@ import { TopicSessionsService } from './topic-sessions.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { TopicSession } from './entities/topic-session.schema';
 import { createModelMock } from '../../test/utils/create-model-mock';
+import { TopicsService } from '../topics/topics.service';
+import { TopicsServiceMock } from '../topics/topics.service.mock';
+import { TaskInstancesService } from '../task-instances/task-instances.service';
+import { TaskInstancesServiceMock } from '../task-instances/task-instances.service.mock';
 
 describe('TopicSessionsService', () => {
     let service: TopicSessionsService;
@@ -13,6 +17,14 @@ describe('TopicSessionsService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 TopicSessionsService,
+                {
+                    provide: TaskInstancesService,
+                    useValue: TaskInstancesServiceMock,
+                },
+                {
+                    provide: TopicsService,
+                    useValue: TopicsServiceMock,
+                },
                 {
                     provide: getModelToken(TopicSession.name),
                     useValue: model,
