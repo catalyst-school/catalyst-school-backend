@@ -16,21 +16,6 @@ export class TaskInstance {
         required: true,
     })
     description: string;
-
-    @Prop({
-        type: String,
-    })
-    option1?: string;
-
-    @Prop({
-        type: String,
-    })
-    option2?: string;
-
-    @Prop({
-        type: String,
-    })
-    option3?: string;
 }
 
 export const TaskInstanceSchema = SchemaFactory.createForClass(TaskInstance);
