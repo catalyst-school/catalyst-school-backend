@@ -8,5 +8,6 @@ import { Goal, GoalSchema } from './entities/goal.schema';
     imports: [MongooseModule.forFeature([{ name: Goal.name, schema: GoalSchema }])],
     controllers: [GoalsController],
     providers: [GoalsService],
+    exports: [GoalsService]
 })
 export class GoalsModule {}

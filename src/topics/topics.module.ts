@@ -14,5 +14,6 @@ import { TopicSection, TopicSectionSchema } from './entities/topic-section.schem
     ],
     controllers: [TopicsController],
     providers: [TopicsService],
+    exports: [TopicsService]
 })
 export class TopicsModule {}

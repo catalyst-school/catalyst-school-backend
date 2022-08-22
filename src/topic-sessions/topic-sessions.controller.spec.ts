@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TopicSessionsController } from './topic-sessions.controller';
 import { TopicSessionsService } from './topic-sessions.service';
-import { TopicSessionServiceMock } from './topic-sesstion.service.mock';
+import { TopicSessionServiceMock } from './topic-session.service.mock';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { createTestModule } from '../../test/utils/create-test-module';
 import * as request from 'supertest';
