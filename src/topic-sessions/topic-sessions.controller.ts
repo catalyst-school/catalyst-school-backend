@@ -1,10 +1,21 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
 import { TopicSessionsService } from './topic-sessions.service';
 import { CreateTopicSessionDto } from './dto/create-topic-session.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { UserDocument } from '../users/entities/user.schema';
+import { AppError } from '../shared/models/app-error';
 
 @Controller('topic-sessions')
 @ApiTags('topic-sessions')
@@ -14,9 +25,16 @@ export class TopicSessionsController {
     constructor(private readonly topicSessionsService: TopicSessionsService) {}
 
     @Post()
-    create(@Body() createTopicSessionDto: CreateTopicSessionDto, @Req() req: Request) {
+    async create(@Body() createTopicSessionDto: CreateTopicSessionDto, @Req() req: Request) {
         const userId = (req.user as UserDocument).id;
-        return this.topicSessionsService.create(userId, createTopicSessionDto);
+        try {
+            return await this.topicSessionsService.create(userId, createTopicSessionDto);
+        } catch (e) {
+            if (e instanceof AppError) {
+                if (e.message === 'APP: Unknown user goal')
+                    throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+            } else throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get(':id')

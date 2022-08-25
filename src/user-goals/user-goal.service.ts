@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
 import { GoalsService } from '../goals/goals.service';
 import { AppError } from '../shared/models/app-error';
+import { TopicSession } from "../topic-sessions/entities/topic-session.schema";
 
 export type FilterOptions = Partial<UserGoal>;
 
@@ -22,7 +23,6 @@ export class UserGoalService {
         if (!goal) throw new AppError('APP: Goal not found');
 
         const userGoal = new this.userGoalModel(createUserGoalDto);
-        userGoal.currentTopic = goal.topics[0];
         return userGoal.save();
     }
 
@@ -35,6 +35,7 @@ export class UserGoalService {
                     path: 'topics',
                 },
             })
+            .populate('currentSession')
             .exec();
     }
 
@@ -44,5 +45,9 @@ export class UserGoalService {
 
     async remove(id: string): Promise<UserGoalDocument> {
         return this.userGoalModel.findByIdAndRemove(id);
+    }
+
+    async setCurrentSession(userGoalId: string, sessionId: TopicSession): Promise<UserGoalDocument> {
+        return this.userGoalModel.findByIdAndUpdate(userGoalId, { currentSession: sessionId } ).exec();
     }
 }

@@ -35,6 +35,7 @@ describe('TopicSessionsController', () => {
                 .post('/topic-sessions')
                 .send({
                     topic: '62ddbd8ee764cf9989956383',
+                    userGoal: '62ddbd8ee764cf9989956383',
                 } as CreateTopicSessionDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -48,21 +49,25 @@ describe('TopicSessionsController', () => {
                     expect(res.body.message).toContain('topic must be a mongodb id');
                     expect(res.body.message).toContain('topic should not be empty');
                     expect(res.body.message).toContain('topic must be a string');
+                    expect(res.body.message).toContain('userGoal must be a mongodb id');
+                    expect(res.body.message).toContain('userGoal should not be empty');
+                    expect(res.body.message).toContain('userGoal must be a string');
                 });
         });
 
-        it(`with error topic session already exists`, () => {
+        it(`with error unknown user goal`, () => {
             topicSessionServiceMock.create.mockRejectedValue(
-                new AppError('App: TopicSession already exists'),
+                new AppError('APP: Unknown user goal'),
             );
             return request(server)
                 .post('/topic-sessions')
                 .send({
                     topic: '62ddbd8ee764cf9989956383',
-                } as any)
-                .expect(HttpStatus.BAD_REQUEST)
+                    userGoal: '62ddbd8ee764cf9989956383',
+                } as CreateTopicSessionDto)
+                .expect(HttpStatus.NOT_FOUND)
                 .expect((res) => {
-                    expect(res.body.message).toContain('App: TopicSession already exists');
+                    expect(res.body.message).toContain('APP: Unknown user goal');
                 });
         });
 
@@ -72,6 +77,7 @@ describe('TopicSessionsController', () => {
                 .post('/topic-sessions')
                 .send({
                     topic: '62ddbd8ee764cf9989956383',
+                    userGoal: '62ddbd8ee764cf9989956383',
                 } as any)
                 .expect(HttpStatus.FORBIDDEN);
         });

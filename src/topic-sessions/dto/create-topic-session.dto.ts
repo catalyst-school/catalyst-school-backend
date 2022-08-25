@@ -5,4 +5,9 @@ export class CreateTopicSessionDto {
     @IsNotEmpty()
     @IsMongoId()
     topic: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @IsMongoId()
+    userGoal: string;
 }

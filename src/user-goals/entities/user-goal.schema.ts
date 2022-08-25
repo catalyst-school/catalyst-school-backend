@@ -12,31 +12,25 @@ export class UserGoal {
     })
     progress: number;
 
-    @Prop(
-        {
-            required: true,
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Goal',
-        },
-    )
+    @Prop({
+        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Goal',
+    })
     goal: string;
 
-    @Prop(
-        {
-            required: true,
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        },
-    )
+    @Prop({
+        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    })
     user: string;
 
-    @Prop(
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Topic',
-        },
-    )
-    currentTopic: string;
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TopicSession',
+    })
+    currentSession?: string;
 }
 
 export const UserGoalSchema = SchemaFactory.createForClass(UserGoal);

@@ -48,6 +48,12 @@ export class TopicSession {
         },
     ])
     tasks?: string[];
+
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserGoal',
+    })
+    userGoal: string;
 }
 
 export const TopicSessionSchema = SchemaFactory.createForClass(TopicSession);
