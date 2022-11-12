@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { UserDocument } from '../users/entities/user.schema';
 import { AppError } from '../shared/models/app-error';
+import { ValidateAnswersDto } from "./dto/validate-answers.dto";
 
 @Controller('topic-sessions')
 @ApiTags('topic-sessions')
@@ -40,5 +41,14 @@ export class TopicSessionsController {
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.topicSessionsService.findOne(id);
+    }
+
+    @Post(':id/answers')
+    validateAnswers(@Body() validateAnswersDto: ValidateAnswersDto) {
+        // return this.topicSessionsService.findOne(id);
+        /**
+         * todo: validate answers one by one and depending on the type of the section (training|test) and
+         *      the amount of right answers change status of current topic session and recalculate progress
+         */
     }
 }

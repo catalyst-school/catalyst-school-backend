@@ -16,4 +16,8 @@ export class TaskInstancesService {
         const taskInstance = new this.model({ sheetId, ...taskData });
         return taskInstance.save();
     }
+
+    async validateAnswer(id: string, answer: any) {
+
+    }
 }

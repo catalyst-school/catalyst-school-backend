@@ -5,6 +5,8 @@ import { APIEndpoint } from 'googleapis-common';
 
 export enum ColumnNames {
     Description = 'description',
+    Type = 'type',
+    Answer = 'answer',
 }
 
 @Injectable()

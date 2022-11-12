@@ -16,6 +16,16 @@ export class TaskInstance {
         required: true,
     })
     description: string;
+
+    @Prop({
+        type: String,
+    })
+    type: string;
+
+    @Prop({
+        type: String,
+    })
+    answer: string; // todo make it required
 }
 
 export const TaskInstanceSchema = SchemaFactory.createForClass(TaskInstance);
