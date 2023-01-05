@@ -4,6 +4,6 @@ import { PipeTransform, Injectable } from '@nestjs/common';
 export class FileSizeValidationPipe implements PipeTransform {
     transform(value: Express.Multer.File) {
         const oneKb = 5000000;
-        return value.size < oneKb;
+        return value.size < oneKb && value.mimetype.includes('image');
     }
 }
