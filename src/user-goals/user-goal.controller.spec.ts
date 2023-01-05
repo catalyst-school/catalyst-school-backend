@@ -7,8 +7,7 @@ import { UserGoalService } from './user-goal.service';
 import * as request from 'supertest';
 import { JwtAuthGuardMock } from '../shared/guards/jwt-auth.guard.mock';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
-import { AppError } from "../shared/models/app-error";
-
+import { AppError } from '../shared/models/app-error';
 
 describe('UserGoal', () => {
     let app: INestApplication;
@@ -54,7 +53,7 @@ describe('UserGoal', () => {
             serviceMock.create.mockRejectedValueOnce(new AppError('APP: Goal not found'));
             return request(server)
                 .post('/user-goal')
-                .send({ goal: "6288b59786e37c69fcf618a0" })
+                .send({ goal: '6288b59786e37c69fcf618a0' })
                 .expect(HttpStatus.NOT_FOUND)
                 .expect((res) => {
                     expect(res.body.message).toContain('APP: Goal not found');
