@@ -15,22 +15,20 @@ describe('Files', () => {
     const jwtGuard = JwtAuthGuardMock;
     const uploadFolder = `${path}/uploads`;
     const filePictureMock = {
-        value: {
-            fieldname: 'file',
-            originalname: 'IMG_8951.HEIC',
-            encoding: '7bit',
-            mimetype: 'image/heic',
-            buffer: {
-                type: 'Buffer',
-                data: '',
-            },
-            size: 584214,
+        fieldname: 'file',
+        originalname: 'IMG_8951.HEIC',
+        encoding: '7bit',
+        mimetype: 'image/heic',
+        buffer: {
+            type: 'Buffer',
+            data: '',
         },
+        size: 584214,
     };
     const serviceMock = {
         saveFile: jest.fn().mockResolvedValue({
-            url: `${uploadFolder}/${filePictureMock.value.originalname}`,
-            name: filePictureMock.value.originalname,
+            url: `${uploadFolder}/${filePictureMock.originalname}`,
+            name: filePictureMock.originalname,
         }),
     };
 
