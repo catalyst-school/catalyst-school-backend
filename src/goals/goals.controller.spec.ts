@@ -6,7 +6,7 @@ import { createServiceMock } from '../../test/utils/create-service-mock';
 import { createTestModule } from '../../test/utils/create-test-module';
 import * as request from 'supertest';
 import { CreateGoalDto } from './dto/create-goal.dto';
-import { UpdateGoalDto } from "./dto/update-goal.dto";
+import { UpdateGoalDto } from './dto/update-goal.dto';
 
 describe('GoalsController', () => {
     let app: INestApplication;
@@ -30,7 +30,7 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: ["123234234"]
+                    topics: ['123234234'],
                 } as CreateGoalDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -53,13 +53,11 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: "string",
+                    topics: 'string',
                 } as any)
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
-                    expect(res.body.message).toContain(
-                        'topics must be an array',
-                    );
+                    expect(res.body.message).toContain('topics must be an array');
                 });
         });
     });
@@ -70,7 +68,7 @@ describe('GoalsController', () => {
                 .patch('/goals/1')
                 .send({
                     title: 'test',
-                    sections: ["12345"]
+                    sections: ['12345'],
                 } as UpdateGoalDto)
                 .expect(HttpStatus.OK);
         });
