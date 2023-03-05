@@ -6,7 +6,6 @@ import mongoose, { Document } from 'mongoose';
 export type TopicSessionDocument = TopicSession & Document;
 
 export enum TopicSessionStatus {
-    New = 'new',
     Pending = 'pending',
     Completed = 'completed',
 }
@@ -28,15 +27,14 @@ export class TopicSession {
     user: string;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TopicSection',
+        type: String,
     })
-    currentSection?: string;
+    currentUnit?: string;
 
     @Prop({
         type: String,
         enum: Object.values(TopicSessionStatus),
-        default: TopicSessionStatus.New,
+        default: TopicSessionStatus.Pending,
         required: true,
     })
     status: TopicSessionStatus;
