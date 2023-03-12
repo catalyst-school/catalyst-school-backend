@@ -7,14 +7,19 @@ import { TopicsService } from '../topics/topics.service';
 import { TopicsServiceMock } from '../topics/topics.service.mock';
 import { TaskInstancesService } from '../task-instances/task-instances.service';
 import { TaskInstancesServiceMock } from '../task-instances/task-instances.service.mock';
-import { UserGoalServiceMock } from "../user-goals/user-goal.service.mock";
-import { UserGoalService } from "../user-goals/user-goal.service";
+import { UserGoalServiceMock } from '../user-goals/user-goal.service.mock';
+import { UserGoalService } from '../user-goals/user-goal.service';
+import { GoalsService } from '../goals/goals.service';
+import { GoalsServiceMock } from '../goals/goals.service.mock';
+import { TopicSessionStatus } from './entities/topic-session-progress.schema';
 
 describe('TopicSessionsService', () => {
     let service: TopicSessionsService;
-    let modelRes = new TopicSession();
+    const modelRes = new TopicSession();
     let model = createModelMock(modelRes);
     const userGoalServiceMock = UserGoalServiceMock;
+    const goalServiceMock = GoalsServiceMock;
+    const topicsServiceMock = TopicsServiceMock;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +35,11 @@ describe('TopicSessionsService', () => {
                 },
                 {
                     provide: TopicsService,
-                    useValue: TopicsServiceMock,
+                    useValue: topicsServiceMock,
+                },
+                {
+                    provide: GoalsService,
+                    useValue: goalServiceMock,
                 },
                 {
                     provide: getModelToken(TopicSession.name),
@@ -49,10 +58,88 @@ describe('TopicSessionsService', () => {
 
     describe('create topic session', function () {
         it('error: unknown goal', async () => {
-            userGoalServiceMock.findOne.mockResolvedValue(null);
+            userGoalServiceMock.findOne.mockResolvedValueOnce(null);
             await expect(service.create('123', { topic: '123', userGoal: '123' })).rejects.toThrow(
                 'APP: Unknown user goal',
             );
+        });
+
+        it('error: invalid topic', async () => {
+            goalServiceMock.findOne.mockResolvedValueOnce({ topics: [] });
+            await expect(service.create('123', { topic: '123', userGoal: '123' })).rejects.toThrow(
+                'APP: Invalid topic',
+            );
+        });
+    });
+
+    describe('update topic session progress', function () {
+        it('error: Unknown topic session', async () => {
+            model.findOne().exec.mockResolvedValueOnce(null);
+            await expect(
+                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
+            ).rejects.toThrow('APP: Unknown topic session');
+        });
+
+        it('error: Unknown topic session', async () => {
+            topicsServiceMock.findOne.mockResolvedValueOnce(null);
+            await expect(
+                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
+            ).rejects.toThrow('APP: Unknown topic');
+        });
+
+        it('error: Unknown topic session', async () => {
+            topicsServiceMock.findOne.mockResolvedValueOnce({ sections: [] });
+            await expect(
+                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
+            ).rejects.toThrow('APP: Unknown topic section');
+        });
+
+        it('set next unit id as current', async () => {
+            const session: any = {
+                save: jest.fn(),
+            };
+            model.findById().exec.mockResolvedValueOnce(session);
+            topicsServiceMock.findOne.mockResolvedValueOnce({
+                sections: [{ id: 'section1', units: [{ id: 'unit1' }, { id: 'unit2' }] }],
+            });
+
+            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
+            expect(session.progress).toEqual({
+                section: 'section1',
+                unit: 'unit2',
+                status: TopicSessionStatus.Pending,
+            });
+        });
+
+        it('set next section as current', async () => {
+            const session: any = {
+                save: jest.fn(),
+            };
+            model.findById().exec.mockResolvedValueOnce(session);
+            topicsServiceMock.findOne.mockResolvedValueOnce({
+                sections: [{ id: 'section1', units: [{ id: 'unit1' }] }, { id: 'section2' }],
+            });
+
+            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
+            expect(session.progress).toEqual({
+                section: 'section2',
+                status: TopicSessionStatus.Pending,
+            });
+        });
+
+        it('set topic session as completed', async () => {
+            const session: any = {
+                save: jest.fn(),
+            };
+            model.findById().exec.mockResolvedValueOnce(session);
+            topicsServiceMock.findOne.mockResolvedValueOnce({
+                sections: [{ id: 'section1', units: [{ id: 'unit1' }] }],
+            });
+
+            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
+            expect(session.progress).toEqual({
+                status: TopicSessionStatus.Completed,
+            });
         });
     });
 });

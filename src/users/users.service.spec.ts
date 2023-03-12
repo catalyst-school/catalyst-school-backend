@@ -6,7 +6,7 @@ import { createModelMock } from '../../test/utils/create-model-mock';
 
 describe('UsersService', () => {
     let service: UsersService;
-    let modelRes = new User();
+    const modelRes = new User();
     let model = createModelMock(modelRes);
 
     beforeEach(async () => {
