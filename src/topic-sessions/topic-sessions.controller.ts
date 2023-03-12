@@ -70,7 +70,7 @@ export class TopicSessionsController {
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
                 if (e.message === 'APP: Unknown topic')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
-                if (e.message === 'APP: Unknown topic section')
+                if (e.message === 'APP: Unknown topic unit')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
             }
 

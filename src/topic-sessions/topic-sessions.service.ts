@@ -8,11 +8,11 @@ import { TaskInstanceDocument } from '../task-instances/entities/task-instance.s
 import { TopicsService } from '../topics/topics.service';
 import { TaskInstancesService } from '../task-instances/task-instances.service';
 import { UserGoalService } from '../user-goals/user-goal.service';
-import { TopicSectionDocument, TopicSectionType } from '../topics/entities/topic-section.schema';
-import { Topic, TopicDocument } from '../topics/entities/topic.schema';
+import { TopicDocument } from '../topics/entities/topic.schema';
 import { TopicSessionProgress, TopicSessionStatus } from './entities/topic-session-progress.schema';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { GoalsService } from '../goals/goals.service';
+import { UnitDocument, UnitType } from '../topics/entities/unit.schema';
 
 @Injectable()
 export class TopicSessionsService {
@@ -51,47 +51,30 @@ export class TopicSessionsService {
     }
 
     async updateProgress(id: string, updateProgressDto: UpdateProgressDto) {
-        const { sectionId, unitId } = updateProgressDto;
+        const { unitId } = updateProgressDto;
 
         const session = await this.findOne(id);
         if (!session) throw new AppError('APP: Unknown topic session');
 
-        const topic = await this.topicService.findOne(session.topic, { path: 'sections' });
+        const topic = await this.topicService.findOne(session.topic, { path: 'units' });
         if (!topic) throw new AppError('APP: Unknown topic');
 
-        const section = topic.sections.find(
-            (section: TopicSectionDocument) => section.id === sectionId,
-        ) as TopicSectionDocument;
+        const unit = topic.units.find((unit) => unit.id === unitId);
+        if (!unit) throw new AppError('APP: Unknown unit');
 
-        if (!section) throw new AppError('APP: Unknown topic section');
-
-        if (section.type === TopicSectionType.TRAINING) {
+        if (unit.type === UnitType.Task) {
             // this.checkTrainingAnswer();
-        } else if (section.type === TopicSectionType.TEST) {
-            // this.checkTestAnswers();
         }
 
-        session.progress = this.calculateProgress(topic, section, unitId);
-
+        session.progress = this.calculateProgress(topic, unit);
         return await session.save();
     }
 
-    private calculateProgress(
-        topic: TopicDocument,
-        section: TopicSectionDocument,
-        unitId: string,
-    ): TopicSessionProgress {
-        const sectionId = section.id;
-        const nextUnitId = this.getNextUnitId(section, unitId);
+    private calculateProgress(topic: TopicDocument, unit: UnitDocument): TopicSessionProgress {
+        const nextUnitId = this.getNextUnitId(topic, unit);
 
         if (nextUnitId) {
-            return { section: sectionId, unit: nextUnitId, status: TopicSessionStatus.Pending };
-        }
-
-        const nextSectionId = this.getNextSectionId(topic, section);
-
-        if (nextSectionId) {
-            return { section: nextSectionId, status: TopicSessionStatus.Pending };
+            return { unit: nextUnitId, status: TopicSessionStatus.Pending };
         }
 
         return { status: TopicSessionStatus.Completed };
@@ -100,26 +83,10 @@ export class TopicSessionsService {
     // todo
     private async generateTopicTasks(topicId: string): Promise<TaskInstanceDocument[]> {
         return [];
-        // const topic = await this.topicService.findOne(topicId);
-        // const tasks = [];
-        // for (const section of topic.sections) {
-        //     for (const task of section.tasks) {
-        //         const taskInstance = await this.taskInstanceService.create(task.properties.sheetId);
-        //         tasks.push(taskInstance);
-        //     }
-        // }
-        // return tasks;
     }
 
-    private getNextUnitId(section: TopicSectionDocument, unitId: string | number): string {
-        const unitIndex = section.units.findIndex((unit) => unit.id === unitId);
-        return section.units[unitIndex + 1]?.id;
-    }
-
-    private getNextSectionId(topic: Topic, section: TopicSectionDocument): string {
-        const sectionIndex = topic.sections.findIndex(
-            (s: TopicSectionDocument) => s.id === section.id,
-        );
-        return topic.sections[sectionIndex + 1]?.id;
+    private getNextUnitId(topic: TopicDocument, unit: UnitDocument): string {
+        const unitIndex = topic.units.findIndex((u) => u.id === unit.id);
+        return topic.units[unitIndex + 1]?.id;
     }
 }

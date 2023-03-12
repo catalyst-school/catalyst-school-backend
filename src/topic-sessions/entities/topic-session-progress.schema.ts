@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { TopicSection } from '../../topics/entities/topic-section.schema';
 import mongoose, { Document } from 'mongoose';
+import { Unit } from '../../topics/entities/unit.schema';
 
 export type TopicSessionDocument = TopicSessionProgress & Document;
 
@@ -11,12 +11,6 @@ export enum TopicSessionStatus {
 
 @Schema()
 export class TopicSessionProgress {
-    @Prop({
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TopicSection',
-    })
-    section?: string;
-
     @Prop({
         type: String,
         enum: Object.values(TopicSessionStatus),

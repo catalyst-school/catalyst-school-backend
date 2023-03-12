@@ -75,23 +75,23 @@ describe('TopicSessionsService', () => {
     describe('update topic session progress', function () {
         it('error: Unknown topic session', async () => {
             model.findOne().exec.mockResolvedValueOnce(null);
-            await expect(
-                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
-            ).rejects.toThrow('APP: Unknown topic session');
+            await expect(service.updateProgress('123', { unitId: '123' })).rejects.toThrow(
+                'APP: Unknown topic session',
+            );
         });
 
         it('error: Unknown topic session', async () => {
             topicsServiceMock.findOne.mockResolvedValueOnce(null);
-            await expect(
-                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
-            ).rejects.toThrow('APP: Unknown topic');
+            await expect(service.updateProgress('123', { unitId: '123' })).rejects.toThrow(
+                'APP: Unknown topic',
+            );
         });
 
-        it('error: Unknown topic session', async () => {
-            topicsServiceMock.findOne.mockResolvedValueOnce({ sections: [] });
-            await expect(
-                service.updateProgress('123', { unitId: '123', sectionId: '123' }),
-            ).rejects.toThrow('APP: Unknown topic section');
+        it('error: Unknown topic unit', async () => {
+            topicsServiceMock.findOne.mockResolvedValueOnce({ units: [] });
+            await expect(service.updateProgress('123', { unitId: '123' })).rejects.toThrow(
+                'APP: Unknown unit',
+            );
         });
 
         it('set next unit id as current', async () => {
@@ -100,29 +100,12 @@ describe('TopicSessionsService', () => {
             };
             model.findById().exec.mockResolvedValueOnce(session);
             topicsServiceMock.findOne.mockResolvedValueOnce({
-                sections: [{ id: 'section1', units: [{ id: 'unit1' }, { id: 'unit2' }] }],
+                units: [{ id: 'unit1' }, { id: 'unit2' }],
             });
 
-            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
+            await service.updateProgress('123', { unitId: 'unit1' });
             expect(session.progress).toEqual({
-                section: 'section1',
                 unit: 'unit2',
-                status: TopicSessionStatus.Pending,
-            });
-        });
-
-        it('set next section as current', async () => {
-            const session: any = {
-                save: jest.fn(),
-            };
-            model.findById().exec.mockResolvedValueOnce(session);
-            topicsServiceMock.findOne.mockResolvedValueOnce({
-                sections: [{ id: 'section1', units: [{ id: 'unit1' }] }, { id: 'section2' }],
-            });
-
-            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
-            expect(session.progress).toEqual({
-                section: 'section2',
                 status: TopicSessionStatus.Pending,
             });
         });
@@ -132,11 +115,9 @@ describe('TopicSessionsService', () => {
                 save: jest.fn(),
             };
             model.findById().exec.mockResolvedValueOnce(session);
-            topicsServiceMock.findOne.mockResolvedValueOnce({
-                sections: [{ id: 'section1', units: [{ id: 'unit1' }] }],
-            });
+            topicsServiceMock.findOne.mockResolvedValueOnce({ units: [{ id: 'unit1' }] });
 
-            await service.updateProgress('123', { unitId: 'unit1', sectionId: 'section1' });
+            await service.updateProgress('123', { unitId: 'unit1' });
             expect(session.progress).toEqual({
                 status: TopicSessionStatus.Completed,
             });

@@ -8,24 +8,16 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TopicSectionType } from '../entities/topic-section.schema';
+import { UnitType } from '../entities/unit.schema';
 
 export class CreateUnitDto {
     @IsNotEmpty()
     @IsString()
     link: string;
-}
 
-export class CreateTopicSectionDto {
     @IsNotEmpty()
-    @IsEnum(TopicSectionType)
-    type: TopicSectionType;
-
-    @IsArray()
-    @IsOptional()
-    @ValidateNested({ each: true })
-    @Type(() => CreateUnitDto)
-    units?: CreateUnitDto[];
+    @IsEnum(UnitType)
+    type: UnitType;
 }
 
 export class CreateTopicDto {
@@ -36,6 +28,6 @@ export class CreateTopicDto {
     @IsArray()
     @IsOptional()
     @ValidateNested({ each: true })
-    @Type(() => CreateTopicSectionDto)
-    sections?: CreateTopicSectionDto[];
+    @Type(() => CreateUnitDto)
+    units?: CreateUnitDto[];
 }
