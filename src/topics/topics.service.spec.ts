@@ -3,7 +3,6 @@ import { TopicsService } from './topics.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Topic } from './entities/topic.schema';
 import { Model } from 'mongoose';
-import { TopicSectionType } from './entities/topic-section.schema';
 
 describe('TopicsService', () => {
     let service: TopicsService;
@@ -20,5 +19,9 @@ describe('TopicsService', () => {
         }).compile();
 
         service = module.get<TopicsService>(TopicsService);
+    });
+
+    it('should be created', function () {
+        expect(service).toBeDefined();
     });
 });

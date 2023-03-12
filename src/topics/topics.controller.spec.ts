@@ -35,14 +35,7 @@ describe('TopicsController', () => {
                         { type: TopicSectionType.THEORY, theories: ['test-id'] },
                         {
                             type: TopicSectionType.TRAINING,
-                            tasks: [
-                                {
-                                    properties: {
-                                        title: '234',
-                                        sheetId: 21,
-                                    },
-                                },
-                            ],
+                            units: [{ link: '62ddbd8ee764cf9989956383' }],
                         },
                     ],
                 } as CreateTopicDto)
@@ -72,7 +65,7 @@ describe('TopicsController', () => {
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
                     expect(res.body.message).toContain(
-                        'sections.0.type must be a valid enum value',
+                        'sections.0.type must be one of the following values: theory, training, test',
                     );
                 });
         });
@@ -87,14 +80,7 @@ describe('TopicsController', () => {
                     sections: [
                         {
                             type: TopicSectionType.TRAINING,
-                            tasks: [
-                                {
-                                    properties: {
-                                        title: '234',
-                                        sheetId: 21,
-                                    },
-                                },
-                            ],
+                            units: [{ link: '62ddbd8ee764cf9989956383' }],
                         },
                     ],
                 } as UpdateTopicDto)
@@ -121,27 +107,7 @@ describe('TopicsController', () => {
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
                     expect(res.body.message).toContain(
-                        'sections.0.type must be a valid enum value',
-                    );
-                });
-        });
-
-        it(`with error wrong task`, () => {
-            return request(server)
-                .patch('/topics/1')
-                .send({
-                    title: 'test',
-                    sections: [
-                        {
-                            type: TopicSectionType.TRAINING,
-                            tasks: [{ some: '123' } as any],
-                        },
-                    ],
-                } as UpdateTopicDto)
-                .expect(HttpStatus.BAD_REQUEST)
-                .expect((res) => {
-                    expect(res.body.message).toContain(
-                        'sections.0.tasks.0.properties should not be empty',
+                        'sections.0.type must be one of the following values: theory, training, test',
                     );
                 });
         });

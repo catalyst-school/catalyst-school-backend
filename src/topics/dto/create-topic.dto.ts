@@ -25,7 +25,7 @@ export class CreateTopicSectionDto {
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => CreateUnitDto)
-    units?: string[];
+    units?: CreateUnitDto[];
 }
 
 export class CreateTopicDto {
