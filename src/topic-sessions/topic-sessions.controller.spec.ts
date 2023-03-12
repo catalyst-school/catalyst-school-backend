@@ -9,6 +9,7 @@ import { CreateTopicSessionDto } from './dto/create-topic-session.dto';
 import { JwtAuthGuardMock } from '../shared/guards/jwt-auth.guard.mock';
 import { JwtAuthGuard } from '../shared/guards/jwt-auth.guard';
 import { AppError } from '../shared/models/app-error';
+import { UpdateProgressDto } from './dto/update-progress.dto';
 
 describe('TopicSessionsController', () => {
     let app: INestApplication;
@@ -29,7 +30,7 @@ describe('TopicSessionsController', () => {
         server = app.getHttpServer();
     });
 
-    describe('create goal', () => {
+    describe('create topic section', () => {
         it(`successfully`, () => {
             return request(server)
                 .post('/topic-sessions')
@@ -56,7 +57,7 @@ describe('TopicSessionsController', () => {
         });
 
         it(`with error unknown user goal`, () => {
-            topicSessionServiceMock.create.mockRejectedValue(
+            topicSessionServiceMock.create.mockRejectedValueOnce(
                 new AppError('APP: Unknown user goal'),
             );
             return request(server)
@@ -71,6 +72,22 @@ describe('TopicSessionsController', () => {
                 });
         });
 
+        it(`with error unknown user goal`, () => {
+            topicSessionServiceMock.create.mockRejectedValueOnce(
+                new AppError('APP: Invalid topic'),
+            );
+            return request(server)
+                .post('/topic-sessions')
+                .send({
+                    topic: '62ddbd8ee764cf9989956383',
+                    userGoal: '62ddbd8ee764cf9989956383',
+                } as CreateTopicSessionDto)
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Invalid topic');
+                });
+        });
+
         it(`with error not authorized`, () => {
             jwtGuard.canActivate.mockReturnValueOnce(false);
             return request(server)
@@ -80,6 +97,107 @@ describe('TopicSessionsController', () => {
                     userGoal: '62ddbd8ee764cf9989956383',
                 } as any)
                 .expect(HttpStatus.FORBIDDEN);
+        });
+    });
+
+    describe('update progress goal', () => {
+        it(`successfully`, () => {
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.OK);
+        });
+
+        it(`with error dtos`, () => {
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({} as UpdateProgressDto)
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('unitId must be a mongodb id');
+                    expect(res.body.message).toContain('unitId should not be empty');
+                    expect(res.body.message).toContain('sectionId must be a mongodb id');
+                    expect(res.body.message).toContain('sectionId should not be empty');
+                });
+        });
+
+        it(`with error unknown topic section`, () => {
+            topicSessionServiceMock.findOne.mockResolvedValueOnce(null);
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.NOT_FOUND)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Unknown topic session');
+                });
+        });
+
+        it(`with wrong user`, () => {
+            topicSessionServiceMock.findOne.mockResolvedValueOnce({ user: '23222' });
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.FORBIDDEN)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Access denied');
+                });
+        });
+
+        it(`with unknown topic session`, () => {
+            topicSessionServiceMock.updateProgress.mockRejectedValueOnce(
+                new AppError('APP: Unknown topic session'),
+            );
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.NOT_FOUND)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Unknown topic session');
+                });
+        });
+
+        it(`with unknown topic`, () => {
+            topicSessionServiceMock.updateProgress.mockRejectedValueOnce(
+                new AppError('APP: Unknown topic'),
+            );
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.NOT_FOUND)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Unknown topic');
+                });
+        });
+
+        it(`with unknown topic section`, () => {
+            topicSessionServiceMock.updateProgress.mockRejectedValueOnce(
+                new AppError('APP: Unknown topic section'),
+            );
+            return request(server)
+                .post('/topic-sessions/62ddbd8ee764cf9989956383/update-progress')
+                .send({
+                    unitId: '62ddbd8ee764cf9989956383',
+                    sectionId: '62ddbd8ee764cf9989956383',
+                } as UpdateProgressDto)
+                .expect(HttpStatus.NOT_FOUND)
+                .expect((res) => {
+                    expect(res.body.message).toContain('APP: Unknown topic section');
+                });
         });
     });
 });

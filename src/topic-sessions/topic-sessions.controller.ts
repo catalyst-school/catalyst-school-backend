@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Get,
+    HttpCode,
     HttpException,
     HttpStatus,
     Param,
@@ -35,7 +36,7 @@ export class TopicSessionsController {
                 if (e.message === 'APP: Unknown user goal')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
                 if (e.message === 'APP: Invalid topic')
-                    throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+                    throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
             }
 
             throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -48,7 +49,8 @@ export class TopicSessionsController {
     }
 
     @Post(':id/update-progress')
-    async checkTask(
+    @HttpCode(HttpStatus.OK)
+    async updateProgress(
         @Param('id') id: string,
         @Body() updateProgressDto: UpdateProgressDto,
         @Req() req: Request,
@@ -64,7 +66,7 @@ export class TopicSessionsController {
             return await this.topicSessionsService.updateProgress(session._id, updateProgressDto);
         } catch (e) {
             if (e instanceof AppError) {
-                if (e.message === 'APP: Unknown topic section')
+                if (e.message === 'APP: Unknown topic session')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
                 if (e.message === 'APP: Unknown topic')
                     throw new HttpException(e.message, HttpStatus.NOT_FOUND);
