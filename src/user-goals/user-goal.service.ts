@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
 import { GoalsService } from '../goals/goals.service';
 import { AppError } from '../shared/models/app-error';
-import { TopicSession } from "../topic-sessions/entities/topic-session.schema";
+import { TopicSession } from '../topic-sessions/entities/topic-session.schema';
 
 export type FilterOptions = Partial<UserGoal>;
 
@@ -19,7 +19,7 @@ export class UserGoalService {
     async create(
         createUserGoalDto: CreateUserGoalDto & { user: string },
     ): Promise<UserGoalDocument> {
-        const goal = await this.goalsService.findOne(createUserGoalDto.goal, true);
+        const goal = await this.goalsService.findOne(createUserGoalDto.goal, { path: 'topics' });
         if (!goal) throw new AppError('APP: Goal not found');
 
         const userGoal = new this.userGoalModel(createUserGoalDto);
@@ -47,7 +47,7 @@ export class UserGoalService {
         return this.userGoalModel.findByIdAndRemove(id);
     }
 
-    async setCurrentSession(userGoalId: string, sessionId: TopicSession): Promise<UserGoalDocument> {
-        return this.userGoalModel.findByIdAndUpdate(userGoalId, { currentSession: sessionId } ).exec();
+    async setCurrentSession(id: string, sessionId: TopicSession): Promise<UserGoalDocument> {
+        return this.userGoalModel.findByIdAndUpdate(id, { currentSession: sessionId }).exec();
     }
 }

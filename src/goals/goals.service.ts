@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PopulateOptions } from 'mongoose';
 import { Goal, GoalDocument } from './entities/goal.schema';
 
 @Injectable()
@@ -18,8 +18,8 @@ export class GoalsService {
         return this.goalModel.find().exec();
     }
 
-    async findOne(id: string, skipPopulation?: boolean) {
-        return this.goalModel.findById(id).populate(skipPopulation ? '' : 'topics').exec();
+    async findOne(id: string, populate?: PopulateOptions) {
+        return this.goalModel.findById(id).populate(populate).exec();
     }
 
     async update(id: string, updateGoalDto: UpdateGoalDto) {

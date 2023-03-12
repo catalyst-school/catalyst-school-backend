@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { TopicSection } from './topic-section.schema';
+import { TopicSection, TopicSectionDocument } from './topic-section.schema';
 
 export type TopicDocument = Topic & Document;
 
@@ -14,7 +14,7 @@ export class Topic {
     title: string;
 
     @Prop([TopicSection])
-    sections?: TopicSection[];
+    sections?: TopicSectionDocument[];
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
