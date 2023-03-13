@@ -31,7 +31,7 @@ describe('TopicsController', () => {
                 .post('/topics')
                 .send({
                     title: 'test',
-                    units: [{ link: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
+                    units: [{ ref: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
                 } as CreateTopicDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -75,7 +75,7 @@ describe('TopicsController', () => {
                 .patch('/topics/1')
                 .send({
                     title: 'test',
-                    units: [{ link: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
+                    units: [{ ref: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
                 } as UpdateTopicDto)
                 .expect(HttpStatus.OK);
         });

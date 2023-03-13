@@ -13,7 +13,7 @@ import { UnitType } from '../entities/unit.schema';
 export class CreateUnitDto {
     @IsNotEmpty()
     @IsString()
-    link: string;
+    ref: string;
 
     @IsNotEmpty()
     @IsEnum(UnitType)
