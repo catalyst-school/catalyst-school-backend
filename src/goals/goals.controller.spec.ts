@@ -30,7 +30,7 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: ['123234234'],
+                    topics: ['62ddbd8ee764cf9989956383'],
                 } as CreateGoalDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -53,7 +53,7 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: 'string',
+                    topics: '62ddbd8ee764cf9989956383',
                 } as any)
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
@@ -68,7 +68,6 @@ describe('GoalsController', () => {
                 .patch('/goals/1')
                 .send({
                     title: 'test',
-                    sections: ['12345'],
                 } as UpdateGoalDto)
                 .expect(HttpStatus.OK);
         });
@@ -79,7 +78,9 @@ describe('GoalsController', () => {
                 .send({ title: 1234 } as any)
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
-                    expect(res.body.message).toContain('title must be shorter than or equal to 255 characters');
+                    expect(res.body.message).toContain(
+                        'title must be shorter than or equal to 255 characters',
+                    );
                     expect(res.body.message).toContain('title must be a string');
                 });
         });

@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsMongoId, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateGoalDto {
     @MaxLength(255)
@@ -8,6 +8,6 @@ export class CreateGoalDto {
 
     @IsArray()
     @IsOptional()
-    @IsString({ each: true })
+    @IsMongoId({ each: true })
     topics?: string[];
 }

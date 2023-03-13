@@ -7,7 +7,7 @@ import { TopicsService } from './topics.service';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { createTestModule } from '../../test/utils/create-test-module';
 import { createServiceMock } from '../../test/utils/create-service-mock';
-import { TopicSectionType } from './entities/topic-section.schema';
+import { UnitType } from './entities/unit.schema';
 
 describe('TopicsController', () => {
     let app: INestApplication;
@@ -31,20 +31,7 @@ describe('TopicsController', () => {
                 .post('/topics')
                 .send({
                     title: 'test',
-                    sections: [
-                        { type: TopicSectionType.THEORY, theories: ['test-id'] },
-                        {
-                            type: TopicSectionType.TRAINING,
-                            tasks: [
-                                {
-                                    properties: {
-                                        title: '234',
-                                        sheetId: 21,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
+                    units: [{ link: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
                 } as CreateTopicDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -62,18 +49,22 @@ describe('TopicsController', () => {
                 });
         });
 
-        it(`with error wrong section type`, () => {
+        it(`with error: wrong unit`, () => {
             return request(server)
                 .post('/topics')
                 .send({
                     title: 'test',
-                    sections: [{ type: 'wrong type' as any }],
+                    units: [{} as any],
                 } as CreateTopicDto)
+
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
+                    expect(res.body.message).toContain('units.0.link must be a string');
+                    expect(res.body.message).toContain('units.0.link should not be empty');
                     expect(res.body.message).toContain(
-                        'sections.0.type must be a valid enum value',
+                        'units.0.type must be one of the following values: theory, task',
                     );
+                    expect(res.body.message).toContain('units.0.type should not be empty');
                 });
         });
     });
@@ -84,21 +75,27 @@ describe('TopicsController', () => {
                 .patch('/topics/1')
                 .send({
                     title: 'test',
-                    sections: [
-                        {
-                            type: TopicSectionType.TRAINING,
-                            tasks: [
-                                {
-                                    properties: {
-                                        title: '234',
-                                        sheetId: 21,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
+                    units: [{ link: '62ddbd8ee764cf9989956383', type: UnitType.Theory }],
                 } as UpdateTopicDto)
                 .expect(HttpStatus.OK);
+        });
+
+        it(`with error: wrong unit`, () => {
+            return request(server)
+                .patch('/topics/1')
+                .send({
+                    title: 'test',
+                    units: [{} as any],
+                } as UpdateTopicDto)
+                .expect(HttpStatus.BAD_REQUEST)
+                .expect((res) => {
+                    expect(res.body.message).toContain('units.0.link must be a string');
+                    expect(res.body.message).toContain('units.0.link should not be empty');
+                    expect(res.body.message).toContain(
+                        'units.0.type must be one of the following values: theory, task',
+                    );
+                    expect(res.body.message).toContain('units.0.type should not be empty');
+                });
         });
 
         it(`with error wrong title`, () => {
@@ -108,41 +105,6 @@ describe('TopicsController', () => {
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
                     expect(res.body.message).toContain('title should not be empty');
-                });
-        });
-
-        it(`with error wrong section type`, () => {
-            return request(server)
-                .patch('/topics/1')
-                .send({
-                    title: 'test',
-                    sections: [{ type: 'wrong type' as any }],
-                } as UpdateTopicDto)
-                .expect(HttpStatus.BAD_REQUEST)
-                .expect((res) => {
-                    expect(res.body.message).toContain(
-                        'sections.0.type must be a valid enum value',
-                    );
-                });
-        });
-
-        it(`with error wrong task`, () => {
-            return request(server)
-                .patch('/topics/1')
-                .send({
-                    title: 'test',
-                    sections: [
-                        {
-                            type: TopicSectionType.TRAINING,
-                            tasks: [{ some: '123' } as any],
-                        },
-                    ],
-                } as UpdateTopicDto)
-                .expect(HttpStatus.BAD_REQUEST)
-                .expect((res) => {
-                    expect(res.body.message).toContain(
-                        'sections.0.tasks.0.properties should not be empty',
-                    );
                 });
         });
 

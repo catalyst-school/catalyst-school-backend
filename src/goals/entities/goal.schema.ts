@@ -14,9 +14,8 @@ export class Goal {
 
     @Prop({
         type: String,
-        required: true,
     })
-    image: string;
+    image?: string;
 
     @Prop([
         {
