@@ -19,6 +19,11 @@ export class Goal {
         },
     ])
     topics?: string[];
+
+    @Prop({
+        type: String,
+    })
+    img?: string;
 }
 
 export const GoalSchema = SchemaFactory.createForClass(Goal);

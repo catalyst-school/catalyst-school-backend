@@ -6,12 +6,17 @@ import { AppError } from '../shared/models/app-error';
 
 @Injectable()
 export class FilesService {
-    async saveFile(file: Express.Multer.File): Promise<FilePictureDto> {
-        const uploadFolder = `${path}/uploads`;
-        await ensureDir(uploadFolder);
+    async saveFile(id: string, file: Express.Multer.File): Promise<FilePictureDto> {
+        const uploadFolder = `/uploads`;
+        await ensureDir(`${path}${uploadFolder}`);
         try {
-            await writeFile(`${uploadFolder}/${file.originalname}`, file.buffer);
-            return { url: `${uploadFolder}/${file.originalname}`, name: file.originalname };
+            const savedFileName = `${id}_${file.originalname}`;
+            await writeFile(`${path}${uploadFolder}/${savedFileName}`, file.buffer);
+
+            return {
+                url: `${uploadFolder}/${file.originalname}`,
+                name: savedFileName,
+            };
         } catch (e) {
             throw new AppError(e.message);
         }

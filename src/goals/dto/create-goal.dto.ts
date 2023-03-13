@@ -10,4 +10,8 @@ export class CreateGoalDto {
     @IsOptional()
     @IsString({ each: true })
     topics?: string[];
+
+    @IsOptional()
+    @IsString()
+    img?: string;
 }

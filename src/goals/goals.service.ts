@@ -19,7 +19,10 @@ export class GoalsService {
     }
 
     async findOne(id: string, skipPopulation?: boolean) {
-        return this.goalModel.findById(id).populate(skipPopulation ? '' : 'topics').exec();
+        return this.goalModel
+            .findById(id)
+            .populate(skipPopulation ? '' : 'topics')
+            .exec();
     }
 
     async update(id: string, updateGoalDto: UpdateGoalDto) {
