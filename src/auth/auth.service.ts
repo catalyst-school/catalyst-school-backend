@@ -8,7 +8,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { EmailService } from '../email/email.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UsersService } from '../users/users.service';
-import { ResendConfirmationDto } from "./dto/resend-confirmation.dto";
+import { ResendConfirmationDto } from './dto/resend-confirmation.dto';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +24,7 @@ export class AuthService {
     }
 
     async login(loginDto: LoginDto) {
-        let userFromDB = await this.userService.findByEmail(loginDto.email);
+        const userFromDB = await this.userService.findByEmail(loginDto.email);
         if (!userFromDB) throw new AppError('App: Unknown user');
 
         const isValidPassword = await bcrypt.compare(loginDto.password, userFromDB.password);
@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-        let userFromDB = await this.userService.findByEmail(forgotPasswordDto.email);
+        const userFromDB = await this.userService.findByEmail(forgotPasswordDto.email);
         if (!userFromDB) throw new AppError('App: Unknown user');
 
         const token = this.generateToken(userFromDB);
@@ -44,14 +44,14 @@ export class AuthService {
     }
 
     async resetPassword(userId: string, resetPasswordDto: ResetPasswordDto) {
-        let userFromDB = await this.userService.findById(userId);
+        const userFromDB = await this.userService.findById(userId);
         if (!userFromDB) throw new AppError('App: Unknown user');
 
         await this.userService.updatePassword(userFromDB._id, resetPasswordDto.password);
     }
 
     async resendConfirmation(resendConfirmationDto: ResendConfirmationDto) {
-        let userFromDB = await this.userService.findByEmail(resendConfirmationDto.email);
+        const userFromDB = await this.userService.findByEmail(resendConfirmationDto.email);
         if (!userFromDB) throw new AppError('App: Unknown user');
 
         const token = this.generateToken(userFromDB);
