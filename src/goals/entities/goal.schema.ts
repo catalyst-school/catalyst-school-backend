@@ -12,6 +12,11 @@ export class Goal {
     })
     title: string;
 
+    @Prop({
+        type: String,
+    })
+    image?: string;
+
     @Prop([
         {
             type: mongoose.Schema.Types.ObjectId,

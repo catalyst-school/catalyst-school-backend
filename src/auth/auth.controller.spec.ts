@@ -235,7 +235,6 @@ describe('AuthController', () => {
         });
     });
 
-
     describe('resend confirmation link', () => {
         it(`successfully`, () => {
             return request(server)
@@ -256,7 +255,9 @@ describe('AuthController', () => {
         });
 
         it(`with error user not found`, () => {
-            authServiceMock.resendConfirmation.mockRejectedValueOnce(new AppError('App: Unknown user'));
+            authServiceMock.resendConfirmation.mockRejectedValueOnce(
+                new AppError('App: Unknown user'),
+            );
             return request(server)
                 .post('/auth/email/resend-confirmation')
                 .send({ email: 'email@email.com' })

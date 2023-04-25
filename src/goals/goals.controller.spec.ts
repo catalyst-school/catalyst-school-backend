@@ -30,7 +30,7 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: ['123234234'],
+                    topics: ['62ddbd8ee764cf9989956383'],
                 } as CreateGoalDto)
                 .expect(HttpStatus.CREATED);
         });
@@ -53,7 +53,7 @@ describe('GoalsController', () => {
                 .post('/goals')
                 .send({
                     title: 'test',
-                    topics: 'string',
+                    topics: '62ddbd8ee764cf9989956383',
                 } as any)
                 .expect(HttpStatus.BAD_REQUEST)
                 .expect((res) => {
