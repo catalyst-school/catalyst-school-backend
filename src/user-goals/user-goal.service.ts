@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserGoalDto } from './dto/create-user-goal.dto';
 import { GoalsService } from '../goals/goals.service';
 import { AppError } from '../shared/models/app-error';
-import { TopicSession } from "../topic-sessions/entities/topic-session.schema";
+import { TopicSession } from '../topic-sessions/entities/topic-session.schema';
 
 export type FilterOptions = Partial<UserGoal>;
 
@@ -47,7 +47,12 @@ export class UserGoalService {
         return this.userGoalModel.findByIdAndRemove(id);
     }
 
-    async setCurrentSession(userGoalId: string, sessionId: TopicSession): Promise<UserGoalDocument> {
-        return this.userGoalModel.findByIdAndUpdate(userGoalId, { currentSession: sessionId } ).exec();
+    async setCurrentSession(
+        userGoalId: string,
+        sessionId: TopicSession,
+    ): Promise<UserGoalDocument> {
+        return this.userGoalModel
+            .findByIdAndUpdate(userGoalId, { currentSession: sessionId })
+            .exec();
     }
 }
