@@ -68,6 +68,7 @@ describe('GoalsController', () => {
                 .patch('/goals/1')
                 .send({
                     title: 'test',
+                    sections: ['12345'],
                 } as UpdateGoalDto)
                 .expect(HttpStatus.OK);
         });
