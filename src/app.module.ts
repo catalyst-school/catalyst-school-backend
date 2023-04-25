@@ -12,15 +12,13 @@ import { EmailModule } from './email/email.module';
 import { TopicSessionsModule } from './topic-sessions/topic-sessions.module';
 import { TaskInstancesModule } from './task-instances/task-instances.module';
 import { UserGoalModule } from './user-goals/user-goal.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 dotenv.config();
-
 @Module({
     imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        MongooseModule.forRoot(`mongodb://localhost/${process.env.DATABASE_NAME}`),
+        ConfigModule.forRoot({ isGlobal: true }),
+        MongooseModule.forRoot(`mongodb://127.0.0.1/${process.env.DATABASE_NAME}`),
         TopicsModule,
         TheoriesModule,
         TasksModule,
@@ -31,6 +29,7 @@ dotenv.config();
         TopicSessionsModule,
         TaskInstancesModule,
         UserGoalModule,
+        AchievementsModule,
     ],
 })
 export class AppModule {}

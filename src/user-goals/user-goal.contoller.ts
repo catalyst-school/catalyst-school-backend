@@ -27,7 +27,10 @@ export class UserGoalController {
     constructor(private readonly userGoalService: UserGoalService) {}
 
     @Post()
-    async create(@Req() req: Request, @Body() createUserGoalDto: CreateUserGoalDto): Promise<UserGoal> {
+    async create(
+        @Req() req: Request,
+        @Body() createUserGoalDto: CreateUserGoalDto,
+    ): Promise<UserGoal> {
         const user = req.user;
         try {
             return await this.userGoalService.create({ ...createUserGoalDto, user: user['_id'] });
